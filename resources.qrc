@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>assets/icons/arrow.svg</file>
+        <file>assets/icons/back.svg</file>
+        <file>assets/icons/changeTheme.svg</file>
+        <file>assets/icons/docx.svg</file>
+        <file>assets/icons/download.svg</file>
+        <file>assets/icons/file.svg</file>
+        <file>assets/icons/pdf.svg</file>
+        <file>assets/icons/pptx.svg</file>
+        <file>assets/icons/settings.svg</file>
+        <file>assets/icons/xls.svg</file>
+    </qresource>
+</RCC>
