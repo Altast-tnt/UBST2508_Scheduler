@@ -29,11 +29,11 @@ public:
 
     QList<File *> files() const;
     void setFiles(const QList<File *> &newFiles);
-    void addFile(File &file);
+    void addFile(File *file);
 
     QList<Deadline *> deadlines() const;
     void setDeadlines(const QList<Deadline *> &newDeadlines);
-    // Подумать для добавления одиночного дедлайна - надо ли
+    // TODO: добавление одиночного дедлайна
 
 signals:
     void nameChanged();

@@ -69,7 +69,7 @@ public:
         PDF,
         PPT,
         PPTX,
-        MAXTYPES
+        MAX_TYPES
     };
 
     Q_ENUM(FileType)
@@ -96,7 +96,7 @@ public:
 private:
     QString m_name;
     QString m_path;
-    FileType m_type;
+    FileType m_type = MAX_TYPES;
 
 signals:
     void nameChanged();

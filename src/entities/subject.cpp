@@ -57,17 +57,18 @@ void Subject::setFiles(const QList<File *> &newFiles)
     emit filesChanged();
 }
 
-void Subject::addFile(File &file)
+// TODO: Подумать над возможностью и логичностью реализации через шаблоны
+void Subject::addFile(File *file)
 {
-
+    if (!file) return;
     for (auto f : std::as_const(m_files))
     {
-        if (f->path() == file.path())
+        if (f->path() == file->path())
         {
             return;
         }
     }
-    m_files.append(&file);
+    m_files.append(file);
     emit filesChanged();
 }
 
