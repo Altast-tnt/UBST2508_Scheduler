@@ -1,5 +1,6 @@
 #include "deadline.h"
 
+
 Deadline::Deadline(QObject *parent)
     : QObject{parent}
 {}
@@ -22,7 +23,7 @@ Deadline::DeadlineType Deadline::type() const
     return m_type;
 }
 
-void Deadline::setType(const DeadlineType &newType)
+void Deadline::setType(DeadlineType newType)
 {
     if (m_type == newType)
         return;

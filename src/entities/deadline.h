@@ -1,5 +1,6 @@
 #ifndef DEADLINE_H
 #define DEADLINE_H
+
 #include <QObject>
 #include <QList>
 #include <QString>
@@ -36,7 +37,7 @@ class Deadline : public QObject
     void setSubject(Subject *newSubject);
 
     DeadlineType type() const;
-    void setType(const DeadlineType &newType);
+    void setType(DeadlineType newType);
 
     QDateTime dateTime() const;
     void setDateTime(const QDateTime &newDateTime);
