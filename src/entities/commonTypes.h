@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 
+
 class Teacher : public QObject
 {
     Q_OBJECT
@@ -154,6 +155,5 @@ inline void File::setName(const QString &newName)
     m_name = newName;
     emit nameChanged();
 }
-
 
 #endif // COMMONTYPES_H

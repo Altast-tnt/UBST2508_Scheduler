@@ -30,6 +30,8 @@ QVariant ScheduleListModel::data(const QModelIndex &index, int role) const
         return lesson->startTime();
     case LessonEndTimeRole:
         return lesson->endTime();
+    case LessonDateRole:
+        return lesson->date();
     default:
         return QVariant();
     }
