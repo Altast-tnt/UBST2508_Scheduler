@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/icons">
+    <qresource prefix="/">
         <file>assets/icons/arrow.svg</file>
         <file>assets/icons/back.svg</file>
         <file>assets/icons/changeTheme.svg</file>
@@ -10,5 +10,6 @@
         <file>assets/icons/pptx.svg</file>
         <file>assets/icons/settings.svg</file>
         <file>assets/icons/xls.svg</file>
+        <file>assets/fonts/Inter_24pt-Medium.ttf</file>
     </qresource>
 </RCC>

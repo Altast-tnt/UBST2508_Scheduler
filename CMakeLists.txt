@@ -10,21 +10,38 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appUBST2508_Sheduler
     main.cpp
+    resources.qrc
 )
+
+set_source_files_properties("ui/theme/Theme.qml" PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
 qt_add_qml_module(appUBST2508_Sheduler
     URI UBST2508_Sheduler
     QML_FILES
         Main.qml
-        SOURCES src/entities/commonTypes.h
-        RESOURCES resources.qrc
-        SOURCES src/entities/subject.h src/entities/subject.cpp
-        SOURCES src/entities/deadline.h src/entities/deadline.cpp
-        SOURCES src/entities/lesson.h src/entities/lesson.cpp
-        SOURCES src/core/appcore.h src/core/appcore.cpp
-        SOURCES src/models/schedulelistmodel.h src/models/schedulelistmodel.cpp
-        SOURCES src/models/daylistmodel.h src/models/daylistmodel.cpp
-        SOURCES src/entities/day.h src/entities/day.cpp
+        ui/theme/Theme.qml
+    RESOURCES
+        "assets/fonts/Inter_24pt-Medium.ttf"
+        "assets/icons/pdf.svg"
+        "assets/icons/docx.svg"
+        "assets/icons/xls.svg"
+        "assets/icons/pptx.svg"
+        "assets/icons/file.svg"
+        "assets/icons/settings.svg"
+        "assets/icons/changeTheme.svg"
+        "assets/icons/back.svg"
+        "assets/icons/arrow.svg"
+        "assets/icons/download.svg"
+    SOURCES
+        src/entities/commonTypes.h
+        src/entities/subject.h src/entities/subject.cpp
+        src/entities/deadline.h src/entities/deadline.cpp
+        src/entities/lesson.h src/entities/lesson.cpp
+        src/core/appcore.h src/core/appcore.cpp
+        src/models/schedulelistmodel.h src/models/schedulelistmodel.cpp
+        src/models/daylistmodel.h src/models/daylistmodel.cpp
+        src/entities/day.h src/entities/day.cpp
+
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
