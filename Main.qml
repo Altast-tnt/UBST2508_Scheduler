@@ -3,17 +3,35 @@ import QtQuick.Controls
 
 Window {
     id: rootWindow
-    width: 640
-    height: 480
+    width: 1200
+    height: 720
+
+    minimumWidth: 640
+    minimumHeight: 480
+
     visible: true
     title: "Проверка"
+
+    Component.onCompleted: {
+        Theme.baseSize = (width < 600) ? 14 : 16
+    }
+
+    // TODO: при дальнейшей верстке протестировать на разных экранах и подобрать значения
+    onWidthChanged: {
+        Theme.baseSize = (width < 600) ? 14 : 16
+    }
 
     FontLoader {
         id: fontInterMedium
         source: "assets/fonts/Inter_24pt-Medium.ttf"
+        onStatusChanged: {
+            console.log("Font status:", status)
+            if (status === FontLoader.Ready) {
+                Theme.fontFamily = fontInterMedium.name
+                console.log("Font status:", status)
+            }
+        }
     }
-
-    property string mainFont: fontInterMedium.name
 
     Column {
         anchors.centerIn: parent
@@ -22,8 +40,8 @@ Window {
         Text {
             id: data
             text: "Данные из C++:"
-            font.pixelSize: 16
-            font.family: rootWindow.mainFont
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.baseSize
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -31,8 +49,8 @@ Window {
 
             text: appcore.currentSubject ? appcore.currentSubject.name : "Нет данных"
 
-            font.pixelSize: 24
-            font.family: rootWindow.mainFont
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeLarge
             font.bold: true
             color: "blue"
             anchors.horizontalCenter: parent.horizontalCenter
