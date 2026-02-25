@@ -10,6 +10,7 @@ Window {
     minimumHeight: 480
 
     visible: true
+    color: Theme.background
     title: "Проверка"
 
     Component.onCompleted: {
@@ -37,29 +38,8 @@ Window {
         anchors.centerIn: parent
         spacing: 20
 
-        Text {
-            id: data
-            text: "Данные из C++:"
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.baseSize
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Text {
-
-            text: appcore.currentSubject ? appcore.currentSubject.name : "Нет данных"
-
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeLarge
-            font.bold: true
-            color: "blue"
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Button {
-            text: "Перезагрузить (Тест)"
-            anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: appcore.loadTestData()
+        LessonCard {
+            anchors.centerIn: parent
         }
     }
 }

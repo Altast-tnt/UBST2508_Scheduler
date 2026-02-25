@@ -41,6 +41,7 @@ qt_add_qml_module(appUBST2508_Sheduler
         src/models/schedulelistmodel.h src/models/schedulelistmodel.cpp
         src/models/daylistmodel.h src/models/daylistmodel.cpp
         src/entities/day.h src/entities/day.cpp
+        QML_FILES ui/components/LessonCard.qml
 
 )
 
