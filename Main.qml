@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+// TODO: убрать все элементы в отдельные кастомные модули (особенно те, которые повторяются)
 Window {
     id: rootWindow
     width: 1200
@@ -103,9 +104,14 @@ Window {
         }
 
         Item {
+            id: conteinerMainScheduleView
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            property int columnsCount: Math.max(
+                                           1, Math.floor(
+                                               (mainScheduleView.width + mainScheduleView.spacing)
+                                               / (250 + mainScheduleView.spacing)))
             ListView {
                 id: mainScheduleView
                 anchors.fill: parent
@@ -119,7 +125,10 @@ Window {
                 highlightMoveDuration: 300
 
                 delegate: ColumnLayout {
-                    width: (rootWindow.width / 4) - 10
+                    id: dayColumn
+                    width: (mainScheduleView.width - mainScheduleView.spacing
+                            * (conteinerMainScheduleView.columnsCount - 1))
+                           / conteinerMainScheduleView.columnsCount
                     height: mainScheduleView.height
 
                     spacing: 15
