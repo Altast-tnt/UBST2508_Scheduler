@@ -23,60 +23,50 @@ void Appcore::loadTestData()
     m_subjects.append(prog);
 
 
+    QDate startDate = QDate::currentDate();
 
-    // ДЕНЬ 1
-    Day* day1 = new Day(this);
-    day1->setDate(QDate::currentDate());
-
-    // Создаем внутреннюю модель уроков для этого дня
-    ScheduleListModel* modelDay1 = new ScheduleListModel(day1);
-    QList<Lesson*> listDay1;
-
-    // Урок 1
-    Lesson* l1 = new Lesson(day1);
-    l1->setSubject(math);
-    l1->setType(Lesson::LECTION);
-    l1->setStartTime(QTime(9, 0));
-    l1->setEndTime(QTime(10, 30));
-    listDay1.append(l1);
-
-    // Урок 2
-    Lesson* l2 = new Lesson(day1);
-    l2->setSubject(history);
-    l2->setType(Lesson::LAB);
-    l2->setStartTime(QTime(10, 40));
-    l2->setEndTime(QTime(12, 10));
-    listDay1.append(l2);
-
-    // Загружаем список в модель дня и прикрепляем модель к дню
-    modelDay1->setLessons(listDay1);
-    day1->setDailyModel(modelDay1);
-
-    // Добавляем день в главную модель
-    m_dayListModel->addDay(day1);
+    for (int i = 0; i < 14; ++i) {
+        QDate currentDate = startDate.addDays(i);
+        Day* day = new Day(this);
+        day->setDate(currentDate);
 
 
-    // ДЕНЬ 2
-    Day* day2 = new Day(this);
-    day2->setDate(QDate::currentDate().addDays(1));
+        ScheduleListModel* modelDay = new ScheduleListModel(day);
+        QList<Lesson*> listDay;
 
-    ScheduleListModel* modelDay2 = new ScheduleListModel(day2);
-    QList<Lesson*> listDay2;
 
-    // Урок 3
-    Lesson* l3 = new Lesson(day2);
-    l3->setSubject(prog);
-    l3->setType(Lesson::LAB);
-    l3->setStartTime(QTime(14, 0));
-    l3->setEndTime(QTime(17, 0));
-    listDay2.append(l3);
+        if (currentDate.dayOfWeek() <= 5) {
+            // Урок 1
+            Lesson* l1 = new Lesson(day);
+            l1->setSubject(math);
+            l1->setType(Lesson::LECTION);
+            l1->setStartTime(QTime(9, 0));
+            l1->setEndTime(QTime(10, 30));
+            listDay.append(l1);
 
-    modelDay2->setLessons(listDay2);
-    day2->setDailyModel(modelDay2);
 
-    m_dayListModel->addDay(day2);
+            if (i % 2 == 0) {
+                Lesson* l2 = new Lesson(day);
+                l2->setSubject(history);
+                l2->setType(Lesson::PRAKTIK);
+                l2->setStartTime(QTime(10, 40));
+                l2->setEndTime(QTime(12, 10));
+                listDay.append(l2);
+            } else {
+                Lesson* l3 = new Lesson(day);
+                l3->setSubject(prog);
+                l3->setType(Lesson::LAB);
+                l3->setStartTime(QTime(12, 30));
+                l3->setEndTime(QTime(14, 0));
+                listDay.append(l3);
+            }
+        }
 
-    // --- НАСТРОЙКИ UI ---
+        modelDay->setLessons(listDay);
+        day->setDailyModel(modelDay);
+        m_dayListModel->addDay(day);
+    }
+
     setCurrentSubject(math);
 }
 

@@ -8,12 +8,13 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
+    Appcore appcore;
     QQmlApplicationEngine engine;
 
     qmlRegisterUncreatableType<ScheduleListModel>("UBST2508_Sheduler", 1, 0, "ScheduleListModel", "Get from AppCore only");
     qmlRegisterUncreatableType<DayListModel>("UBST2508_Sheduler", 1, 0, "DayListModel", "Get from AppCore only");
 
-    Appcore appcore;
+
 
     appcore.loadTestData();
 

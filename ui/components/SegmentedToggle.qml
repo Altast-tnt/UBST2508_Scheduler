@@ -4,6 +4,7 @@ import QtQuick.Layouts
 Rectangle {
     id: segmentedToggle
     radius: 40
+    color: "transparent"
     // TODO: протестировать потом размерность на разных устройствах
     implicitWidth: 340
     implicitHeight: textLessons.implicitHeight + 15
