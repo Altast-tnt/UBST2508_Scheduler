@@ -42,6 +42,7 @@ qt_add_qml_module(appUBST2508_Sheduler
         src/models/daylistmodel.h src/models/daylistmodel.cpp
         src/entities/day.h src/entities/day.cpp
         QML_FILES ui/components/LessonCard.qml
+        QML_FILES ui/components/SegmentedToggle.qml
 
 )
 

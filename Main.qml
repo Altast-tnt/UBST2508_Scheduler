@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 Window {
     id: rootWindow
@@ -34,12 +35,68 @@ Window {
         }
     }
 
-    Column {
-        anchors.centerIn: parent
-        spacing: 20
+    ColumnLayout {
+        id: mainContainer
 
-        LessonCard {
-            anchors.centerIn: parent
+        anchors.fill: parent
+        anchors.margins: 40
+
+        RowLayout {
+            id: header
+            Layout.fillHeight: false
+
+            RoundButton {
+                id: btSettings
+
+                background: Rectangle {
+                    radius: parent.radius
+                    color: "transparent"
+                    border.width: 1
+                    border.color: Theme.textSecondary
+                }
+
+                radius: 100
+                // TODO: Сделать адаптивный размер кнопок
+                width: 50
+                height: 50
+
+                icon.source: "assets/icons/settings.svg"
+                icon.color: Theme.textPrimary
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            SegmentedToggle {
+                id: segmentedToggle
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            RoundButton {
+                id: btChangeTheme
+
+                background: Rectangle {
+                    radius: parent.radius
+                    color: "transparent"
+                    border.width: 1
+                    border.color: Theme.textSecondary
+                }
+
+                radius: 100
+                // TODO: Сделать адаптивный размер кнопок
+                width: 50
+                height: 50
+
+                icon.source: "assets/icons/changeTheme.svg"
+                icon.color: Theme.textPrimary
+            }
+        }
+        Item {
+            Layout.fillHeight: true
         }
     }
 }
