@@ -24,6 +24,7 @@ QtObject {
 
     property string fontFamily: "sans-serif"
     property real baseSize: 16
+    property real headerButtonSize: baseSize * 3
     property real fontSizeSmall: baseSize * 0.8
     property real fontSizeLarge: baseSize * 1.5
 }

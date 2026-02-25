@@ -58,12 +58,13 @@ Window {
                 }
 
                 radius: 100
-                // TODO: Сделать адаптивный размер кнопок
-                width: 50
-                height: 50
+                Layout.preferredWidth: Theme.headerButtonSize
+                Layout.preferredHeight: Theme.headerButtonSize
 
                 icon.source: "assets/icons/settings.svg"
                 icon.color: Theme.textPrimary
+                icon.width: Theme.headerButtonSize * 0.5
+                icon.height: Theme.headerButtonSize * 0.5
             }
 
             Item {
@@ -90,12 +91,13 @@ Window {
                 }
 
                 radius: 100
-                // TODO: Сделать адаптивный размер кнопок
-                width: 50
-                height: 50
+                Layout.preferredWidth: Theme.headerButtonSize
+                Layout.preferredHeight: Theme.headerButtonSize
 
                 icon.source: "assets/icons/changeTheme.svg"
                 icon.color: Theme.textPrimary
+                icon.width: Theme.headerButtonSize * 0.5
+                icon.height: Theme.headerButtonSize * 0.5
 
                 onClicked: {
                     Theme.isDark = !Theme.isDark
@@ -212,9 +214,7 @@ Window {
 
                 background: Rectangle {
                     radius: 100
-                    color: btBackArrow.hovered ? Theme.accentBlue : Theme.surface
-                    border.width: 1
-                    border.color: Theme.textSecondary
+                    color: btBackArrow.hovered ? Theme.accentBlue : "transparent"
                     opacity: 0.8
                 }
                 font.family: Theme.fontFamily
@@ -244,9 +244,7 @@ Window {
 
                 background: Rectangle {
                     radius: 100
-                    color: btForwardArrow.hovered ? Theme.accentBlue : Theme.surface
-                    border.width: 1
-                    border.color: Theme.textSecondary
+                    color: btForwardArrow.hovered ? Theme.accentBlue : "transparent"
                     opacity: 0.8
                 }
                 font.family: Theme.fontFamily

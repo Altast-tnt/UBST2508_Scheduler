@@ -44,21 +44,42 @@ void Appcore::loadTestData()
             l1->setEndTime(QTime(10, 30));
             listDay.append(l1);
 
+            Lesson* l2 = new Lesson(day);
+            l2->setSubject(history);
+            l2->setType(Lesson::PRAKTIK);
+            l2->setStartTime(QTime(10, 40));
+            l2->setEndTime(QTime(12, 10));
+            listDay.append(l2);
+
+            Lesson* l3 = new Lesson(day);
+            l3->setSubject(history);
+            l3->setType(Lesson::PRAKTIK);
+            l3->setStartTime(QTime(10, 40));
+            l3->setEndTime(QTime(12, 10));
+            listDay.append(l3);
+
+            Lesson* l4 = new Lesson(day);
+            l4->setSubject(history);
+            l4->setType(Lesson::PRAKTIK);
+            l4->setStartTime(QTime(10, 40));
+            l4->setEndTime(QTime(12, 10));
+            listDay.append(l4);
+
 
             if (i % 2 == 0) {
-                Lesson* l2 = new Lesson(day);
-                l2->setSubject(history);
-                l2->setType(Lesson::PRAKTIK);
-                l2->setStartTime(QTime(10, 40));
-                l2->setEndTime(QTime(12, 10));
-                listDay.append(l2);
+                Lesson* l5 = new Lesson(day);
+                l5->setSubject(history);
+                l5->setType(Lesson::PRAKTIK);
+                l5->setStartTime(QTime(10, 40));
+                l5->setEndTime(QTime(12, 10));
+                listDay.append(l5);
             } else {
-                Lesson* l3 = new Lesson(day);
-                l3->setSubject(prog);
-                l3->setType(Lesson::LAB);
-                l3->setStartTime(QTime(12, 30));
-                l3->setEndTime(QTime(14, 0));
-                listDay.append(l3);
+                Lesson* l6 = new Lesson(day);
+                l6->setSubject(prog);
+                l6->setType(Lesson::LAB);
+                l6->setStartTime(QTime(12, 30));
+                l6->setEndTime(QTime(14, 0));
+                listDay.append(l6);
             }
         }
 
