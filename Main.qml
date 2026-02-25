@@ -40,6 +40,7 @@ Window {
 
         anchors.fill: parent
         anchors.margins: 40
+        spacing: 40
 
         RowLayout {
             id: header
@@ -95,8 +96,73 @@ Window {
                 icon.color: Theme.textPrimary
             }
         }
-        Item {
+
+        ListView {
+            id: mainScheduleView
+            Layout.fillWidth: true
             Layout.fillHeight: true
+            orientation: ListView.Horizontal
+            spacing: 30
+
+            clip: true
+            model: appcore.dayListModel
+
+            delegate: ColumnLayout {
+                width: (rootWindow.width / 4)
+                height: mainScheduleView.height
+
+                spacing: 15
+
+                Rectangle {
+                    Layout.alignment: Qt.AlignHCenter
+                    implicitWidth: textDay.implicitWidth + 30
+                    implicitHeight: textDay.implicitHeight + 15
+                    radius: 20
+
+                    border.color: Theme.accentBlue
+                    border.width: 1
+                    color: Theme.surface
+
+                    Text {
+                        id: textDay
+                        anchors.centerIn: parent
+                        text: dateStringRole.toLocaleDateString(
+                                  Qt.locale("ru_RU"), "dddd dd.MM")
+                        font.family: Theme.fontFamily
+                        color: Theme.textPrimary
+                        font.capitalization: Font.Capitalize
+                    }
+                }
+
+                ListView {
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    spacing: 10
+                    model: lessonsModelRole
+
+                    delegate: LessonCard {
+                        width: ListView.view.width
+
+                        sName: subjectName
+                        lTime: Qt.formatTime(lessonStartTime,
+                                             "hh:mm") + " - " + Qt.formatTime(
+                                   lessonEndTime, "hh:mm")
+
+                        lType: {
+                            if (lessonType === 0)
+                                return "Лекция"
+                            if (lessonType === 1)
+                                return "Практика"
+                            if (lessonType === 2)
+                                return "Лабораторная"
+                            return "Занятие"
+                        }
+                    }
+                }
+            }
         }
     }
 }

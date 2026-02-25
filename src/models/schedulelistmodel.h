@@ -33,4 +33,5 @@ private:
     QList<Lesson*> m_lessons;
 };
 
+Q_DECLARE_METATYPE(ScheduleListModel*)
 #endif // SCHEDULELISTMODEL_H
