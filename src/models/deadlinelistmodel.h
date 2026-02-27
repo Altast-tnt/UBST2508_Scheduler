@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QList>
+#include "src/entities/deadline.h"
 
 class DeadlineListModel : public QAbstractListModel
 {
@@ -19,6 +20,17 @@ public:
     };
 
     explicit DeadlineListModel(QObject *parent = nullptr);
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+    QHash<int, QByteArray> roleNames() const override;
+
+    void setDeadlines(const QList<Deadline*> &deadlines);
+
+private:
+    QList<Deadline*> m_deadlines;
 
 signals:
 };

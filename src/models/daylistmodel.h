@@ -12,7 +12,8 @@ public:
     enum DayRoles
     {
         DateStringRole = Qt::UserRole + 1,
-        LessonsModelRole
+        LessonsModelRole,
+        DeadlinesModelRole
     };
     explicit DayListModel(QObject *parent = nullptr);
 

@@ -32,7 +32,9 @@ void Appcore::loadTestData()
 
 
         ScheduleListModel* modelDay = new ScheduleListModel(day);
+        DeadlineListModel* deadlineModelDay = new DeadlineListModel(day);
         QList<Lesson*> listDay;
+        QList<Deadline*> deadlineListDay;
 
 
         if (currentDate.dayOfWeek() <= 5) {
@@ -65,6 +67,21 @@ void Appcore::loadTestData()
             l4->setEndTime(QTime(12, 10));
             listDay.append(l4);
 
+            Deadline* d1 = new Deadline(day);
+            d1->setSubject(math);
+            d1->setType(Deadline::PR);
+            d1->setDateTime(QDateTime(currentDate, QTime(23, 59)));
+            d1->setIsCompleted(false);
+            deadlineListDay.append(d1);
+
+            Deadline* d2 = new Deadline(day);
+            d2->setSubject(history);
+            d2->setType(Deadline::KR);
+            d2->setDateTime(QDateTime(currentDate, QTime(23, 59)));
+            d2->setIsCompleted(true);
+            deadlineListDay.append(d2);
+
+
 
             if (i % 2 == 0) {
                 Lesson* l5 = new Lesson(day);
@@ -73,6 +90,14 @@ void Appcore::loadTestData()
                 l5->setStartTime(QTime(10, 40));
                 l5->setEndTime(QTime(12, 10));
                 listDay.append(l5);
+
+                Deadline* d3 = new Deadline(day);
+                d3->setSubject(prog);
+                d3->setType(Deadline::PR);
+                d3->setDateTime(QDateTime(currentDate, QTime(23, 59)));
+                d3->setIsCompleted(false);
+                deadlineListDay.append(d3);
+
             } else {
                 Lesson* l6 = new Lesson(day);
                 l6->setSubject(prog);
@@ -85,7 +110,14 @@ void Appcore::loadTestData()
 
         modelDay->setLessons(listDay);
         day->setDailyModel(modelDay);
+
+        deadlineModelDay->setDeadlines(deadlineListDay);
+        day->setDailyDeadlines(deadlineModelDay);
+
         m_dayListModel->addDay(day);
+
+
+
     }
 
     setCurrentSubject(math);
@@ -143,18 +175,18 @@ void Appcore::setScheduleModel(ScheduleListModel *newScheduleModel)
     emit scheduleModelChanged();
 }
 
-// DeadlineListModel *Appcore::deadlineModel() const
-// {
-//     return m_deadlineModel;
-// }
+DeadlineListModel *Appcore::deadlineModel() const
+{
+    return m_deadlineModel;
+}
 
-// void Appcore::setDeadlineModel(DeadlineListModel *newDeadlineModel)
-// {
-//     if (m_deadlineModel == newDeadlineModel)
-//         return;
-//     m_deadlineModel = newDeadlineModel;
-//     emit deadlineModelChanged();
-// }
+void Appcore::setDeadlineModel(DeadlineListModel *newDeadlineModel)
+{
+    if (m_deadlineModel == newDeadlineModel)
+        return;
+    m_deadlineModel = newDeadlineModel;
+    emit deadlineModelChanged();
+}
 
 // FileListModel *Appcore::fileModel() const
 // {

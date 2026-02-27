@@ -44,6 +44,10 @@ qt_add_qml_module(appUBST2508_Sheduler
         QML_FILES ui/components/LessonCard.qml
         QML_FILES ui/components/SegmentedToggle.qml
         SOURCES src/models/deadlinelistmodel.h src/models/deadlinelistmodel.cpp
+        QML_FILES ui/pages/SchedulePage.qml
+        QML_FILES ui/pages/DeadlinesPage.qml
+        QML_FILES ui/components/DayBoard.qml
+        QML_FILES ui/components/DeadlineCard.qml
 
 )
 

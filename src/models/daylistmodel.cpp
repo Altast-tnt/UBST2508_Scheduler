@@ -23,6 +23,8 @@ QVariant DayListModel::data(const QModelIndex &index, int role) const
         return day->date();
     case LessonsModelRole:
         return QVariant::fromValue(day->dailyModel());
+    case DeadlinesModelRole:
+        return QVariant::fromValue(day->dailyDeadlines());
     default:
         return QVariant();
     }
@@ -33,6 +35,7 @@ QHash<int, QByteArray> DayListModel::roleNames() const
     QHash<int, QByteArray> roles;
     roles[DateStringRole] = "dateStringRole";
     roles[LessonsModelRole] = "lessonsModelRole";
+    roles[DeadlinesModelRole] = "deadlinesModelRole";
     return roles;
 }
 

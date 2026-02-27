@@ -31,3 +31,16 @@ void Day::setDailyModel(ScheduleListModel *newDailyModel)
     m_dailyModel = newDailyModel;
     emit dailyModelChanged();
 }
+
+DeadlineListModel *Day::dailyDeadlines() const
+{
+    return m_dailyDeadlines;
+}
+
+void Day::setDailyDeadlines(DeadlineListModel *newDailyDeadlines)
+{
+    if (m_dailyDeadlines == newDailyDeadlines)
+        return;
+    m_dailyDeadlines = newDailyDeadlines;
+    emit dailyDeadlinesChanged();
+}
