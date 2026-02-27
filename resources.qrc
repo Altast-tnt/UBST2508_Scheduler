@@ -11,5 +11,6 @@
         <file>assets/icons/settings.svg</file>
         <file>assets/icons/xls.svg</file>
         <file>assets/fonts/Inter_24pt-Medium.ttf</file>
+        <file>assets/images/noDeadline.gif</file>
     </qresource>
 </RCC>
