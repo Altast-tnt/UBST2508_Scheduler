@@ -50,3 +50,14 @@ void DayListModel::addDay(Day *day)
     endInsertRows();
 }
 
+Day *DayListModel::getDay(const QDate &date) const
+{
+    for (auto day : m_days) {
+        if (day->date() == date)
+        {
+            return day;
+        }
+    }
+    return nullptr;
+}
+

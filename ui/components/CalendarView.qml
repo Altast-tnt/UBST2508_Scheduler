@@ -1,36 +1,140 @@
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
 
-MonthGrid {
-    property int currentMonth
-    property int currentYear
+ColumnLayout {
+    id: rootLayout
 
-    RoundButton {
-        id: btForwardArrow
-        icon.source: "../../assets/icons/arrow.svg"
-        icon.color: Theme.textPrimary
-        z: 2
-        hoverEnabled: true
-        anchors.right: parent.right
-        anchors.verticalCenter: mainScheduleView.top
-        anchors.verticalCenterOffset: 18
+    Layout.fillWidth: true
+    Layout.fillHeight: true
 
-        visible: mainScheduleView.contentX < (mainScheduleView.contentWidth
-                                              - mainScheduleView.width - 10)
+    spacing: 10
 
-        onClicked: {
+    property date baseDate: new Date()
 
-            var index = mainScheduleView.indexAt(mainScheduleView.contentX, 0)
+    property var monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
 
-            mainScheduleView.positionViewAtIndex(index + 1, ListView.Beginning)
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignHCenter
+        spacing: 20
+
+        NavigationButton {
+            iconPath: "../../assets/icons/back.svg"
+            onClicked: {
+                rootLayout.baseDate = new Date(rootLayout.baseDate.getFullYear(
+                                                   ),
+                                               rootLayout.baseDate.getMonth(
+                                                   ) - 1, 1)
+            }
         }
 
-        background: Rectangle {
-            radius: 100
-            color: btForwardArrow.hovered ? Theme.accentBlue : "transparent"
-            opacity: 0.8
+        Text {
+            text: rootLayout.monthNames[rootLayout.baseDate.getMonth(
+                                            )] + " " + rootLayout.baseDate.getFullYear()
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeLarge
+            font.capitalization: Font.Capitalize
+            color: Theme.textPrimary
         }
-        font.family: Theme.fontFamily
-        palette.buttonText: Theme.textPrimary
+
+        NavigationButton {
+            iconPath: "../../assets/icons/arrow.svg"
+            onClicked: {
+                rootLayout.baseDate = new Date(rootLayout.baseDate.getFullYear(
+                                                   ),
+                                               rootLayout.baseDate.getMonth(
+                                                   ) + 1, 1)
+            }
+        }
+    }
+
+    MonthGrid {
+        id: grid
+
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        month: rootLayout.baseDate.getMonth()
+        year: rootLayout.baseDate.getFullYear()
+
+        locale: Qt.locale("ru_RU")
+
+        delegate: Rectangle {
+            id: dayCell
+
+            property var dayObject: appcore.dayListModel.getDay(model.date)
+
+            color: Theme.surface
+
+            border.width: 1
+            border.color: Theme.textSecondary
+            radius: 4
+
+            Text {
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    margins: 8
+                }
+                text: model.day
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
+                color: model.month === grid.month ? Theme.textPrimary : Theme.textSecondary
+                opacity: model.month === grid.month ? 1 : 0.5
+                z: 2
+            }
+
+            ListView {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                    right: parent.right
+                    topMargin: 30
+                    margins: 4
+                }
+
+                spacing: 4
+                clip: true
+                interactive: false
+
+                model: (dayCell.dayObject
+                        && dayCell.dayObject.dailyDeadlines) ? dayCell.dayObject.dailyDeadlines : null
+                delegate: Rectangle {
+                    width: ListView.view.width
+                    height: 22
+                    radius: 6
+
+                    color: model.deadlineIsCompletedRole ? Theme.accentGreen : Theme.accentRed
+
+                    Text {
+
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            left: parent.left
+                            right: parent.right
+                            margins: 4
+                        }
+
+                        text: model.subjectName
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.textPrimary
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: Theme.accentBlue
+                border.width: 2
+                radius: 4
+                visible: model.today
+                z: 1
+            }
+        }
     }
 }

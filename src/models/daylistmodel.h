@@ -25,6 +25,8 @@ public:
 
     void addDay(Day* day);
 
+    Q_INVOKABLE Day* getDay(const QDate &date) const;
+
 private:
     QList<Day*> m_days;
 };
