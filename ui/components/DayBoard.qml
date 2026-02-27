@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
@@ -70,19 +69,13 @@ Item {
         }
     }
 
-    RoundButton {
+    NavigationButton {
         id: btBackArrow
-        icon.source: "../../assets/icons/back.svg"
-        icon.color: Theme.textPrimary
-        z: 2
-        hoverEnabled: true
+        iconPath: "../../assets/icons/back.svg"
+
         anchors.left: parent.left
         anchors.verticalCenter: mainScheduleView.top
-        anchors.verticalCenterOffset: 18
-        anchors.leftMargin: 0
-
         visible: mainScheduleView.contentX > 10
-
         onClicked: {
 
             var index = mainScheduleView.indexAt(mainScheduleView.contentX, 0)
@@ -92,41 +85,22 @@ Item {
                                                      ListView.Beginning)
             }
         }
-
-        background: Rectangle {
-            radius: 100
-            color: btBackArrow.hovered ? Theme.accentBlue : "transparent"
-            opacity: 0.8
-        }
-        font.family: Theme.fontFamily
     }
 
-    RoundButton {
+    NavigationButton {
         id: btForwardArrow
-        icon.source: "../../assets/icons/arrow.svg"
-        icon.color: Theme.textPrimary
-        z: 2
-        hoverEnabled: true
+
+        iconPath: "../../assets/icons/arrow.svg"
+
         anchors.right: parent.right
         anchors.verticalCenter: mainScheduleView.top
-        anchors.verticalCenterOffset: 18
-
         visible: mainScheduleView.contentX < (mainScheduleView.contentWidth
                                               - mainScheduleView.width - 10)
-
         onClicked: {
 
             var index = mainScheduleView.indexAt(mainScheduleView.contentX, 0)
 
             mainScheduleView.positionViewAtIndex(index + 1, ListView.Beginning)
         }
-
-        background: Rectangle {
-            radius: 100
-            color: btForwardArrow.hovered ? Theme.accentBlue : "transparent"
-            opacity: 0.8
-        }
-        font.family: Theme.fontFamily
-        palette.buttonText: Theme.textPrimary
     }
 }

@@ -48,6 +48,8 @@ qt_add_qml_module(appUBST2508_Sheduler
         QML_FILES ui/pages/DeadlinesPage.qml
         QML_FILES ui/components/DayBoard.qml
         QML_FILES ui/components/DeadlineCard.qml
+        QML_FILES ui/components/CalendarView.qml
+        QML_FILES ui/components/NavigationButton.qml
 
 )
 

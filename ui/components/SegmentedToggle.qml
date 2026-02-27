@@ -5,8 +5,8 @@ Rectangle {
     id: segmentedToggle
     radius: 40
     color: "transparent"
-    // TODO: протестировать потом размерность на разных устройствах
 
+    // TODO: протестировать потом размерность на разных устройствах
     border.color: Theme.accentBlue
     border.width: 1
 

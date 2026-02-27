@@ -41,7 +41,7 @@ Window {
 
         anchors.fill: parent
         anchors.margins: 40
-        spacing: 40
+        spacing: 20
 
         RowLayout {
             id: header
