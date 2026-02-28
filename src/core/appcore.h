@@ -9,7 +9,8 @@
 #include "src/models/schedulelistmodel.h"
 #include "src/models/daylistmodel.h"
 #include "src/models/deadlinelistmodel.h"
-// class FileListModel;
+#include "src/models/filelistmodel.h"
+
 
 class Appcore : public QObject
 {
@@ -21,7 +22,7 @@ class Appcore : public QObject
     Q_PROPERTY(ScheduleListModel* scheduleModel READ scheduleModel WRITE setScheduleModel NOTIFY scheduleModelChanged FINAL)
     Q_PROPERTY(DayListModel* dayListModel READ dayListModel WRITE setDayListModel NOTIFY dayListModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* deadlineModel READ deadlineModel WRITE setDeadlineModel NOTIFY deadlineModelChanged FINAL)
-    // Q_PROPERTY(FileListModel* fileModel READ fileModel WRITE setFileModel NOTIFY fileModelChanged FINAL)
+    Q_PROPERTY(FileListModel* fileModel READ fileModel WRITE setFileModel NOTIFY fileModelChanged FINAL)
 
 public:
     explicit Appcore(QObject *parent = nullptr);
@@ -43,8 +44,8 @@ public:
     DeadlineListModel *deadlineModel() const;
     void setDeadlineModel(DeadlineListModel *newDeadlineModel);
 
-    // FileListModel *fileModel() const;
-    // void setFileModel(FileListModel *newFileModel);
+    FileListModel *fileModel() const;
+    void setFileModel(FileListModel *newFileModel);
 
      DayListModel *dayListModel() const;
      void setDayListModel(DayListModel *newDayListModel);
@@ -69,7 +70,7 @@ private:
     QList<Subject *> m_subjects;
     ScheduleListModel *m_scheduleModel = nullptr;
     DeadlineListModel *m_deadlineModel = nullptr;
-    // FileListModel *m_fileModel = nullptr;
+    FileListModel *m_fileModel = nullptr;
     DayListModel *m_dayListModel = nullptr;
 };
 

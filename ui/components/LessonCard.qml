@@ -4,7 +4,7 @@ import QtQuick.Layouts
 Rectangle {
     id: lessonCard
     radius: 10
-    color: Theme.surface
+    color: (cardMouseArea.containsMouse) ? Theme.background : Theme.surface
     implicitWidth: 260
     implicitHeight: layoutTexts.implicitHeight + 32
 
@@ -48,6 +48,17 @@ Rectangle {
                 pixelSize: Theme.fontSizeSmall
             }
             color: Theme.accentBlue
+        }
+    }
+
+    MouseArea {
+        id: cardMouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        onClicked: {
+            appcore.currentSubject = model.subjectObject
+
+            globalSubjectPopup.open()
         }
     }
 }

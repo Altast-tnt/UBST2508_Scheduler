@@ -1,10 +1,12 @@
 #include "appcore.h"
 #include "src/entities/day.h"
+#include "src/entities/commonTypes.h"
 
 Appcore::Appcore(QObject *parent)
     : QObject{parent}
 {
     m_dayListModel = new DayListModel(this);
+    m_fileModel = new FileListModel(this);
 }
 
 void Appcore::loadTestData()
@@ -14,8 +16,16 @@ void Appcore::loadTestData()
     math->setName("Высшая математика");
     m_subjects.append(math);
 
+    Teacher* historyTeacher = new Teacher();
+    historyTeacher->setName("Лаврова Ирина Анатольевна");
+    historyTeacher->setEmail("iralavrova@mail.com");
+
+    File* presHistory = new File("Лекция 1", "../../lect1.pptx", File::PPTX, this);
+
     Subject* history = new Subject(this);
     history->setName("История России");
+    history->addTeacher(historyTeacher);
+    history->addFile(presHistory);
     m_subjects.append(history);
 
     Subject* prog = new Subject(this);
@@ -133,6 +143,10 @@ void Appcore::setCurrentSubject(Subject *newCurrentSubject)
     if (m_currentSubject == newCurrentSubject)
         return;
     m_currentSubject = newCurrentSubject;
+
+    if (m_currentSubject && m_fileModel) {
+        m_fileModel->setFiles(m_currentSubject->files());
+    }
     emit currentSubjectChanged();
 }
 
@@ -188,18 +202,18 @@ void Appcore::setDeadlineModel(DeadlineListModel *newDeadlineModel)
     emit deadlineModelChanged();
 }
 
-// FileListModel *Appcore::fileModel() const
-// {
-//     return m_fileModel;
-// }
+FileListModel *Appcore::fileModel() const
+{
+    return m_fileModel;
+}
 
-// void Appcore::setFileModel(FileListModel *newFileModel)
-// {
-//     if (m_fileModel == newFileModel)
-//         return;
-//     m_fileModel = newFileModel;
-//     emit fileModelChanged();
-// }
+void Appcore::setFileModel(FileListModel *newFileModel)
+{
+    if (m_fileModel == newFileModel)
+        return;
+    m_fileModel = newFileModel;
+    emit fileModelChanged();
+}
 
 DayListModel *Appcore::dayListModel() const
 {

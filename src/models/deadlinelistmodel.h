@@ -33,7 +33,6 @@ public:
 private:
     QList<Deadline*> m_deadlines;
 
-signals:
 };
 
 #endif // DEADLINELISTMODEL_H

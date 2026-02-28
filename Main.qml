@@ -116,4 +116,7 @@ Window {
             DeadlinesPage {}
         }
     }
+    SubjectPopup {
+        id: globalSubjectPopup
+    }
 }

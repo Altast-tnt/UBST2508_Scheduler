@@ -51,6 +51,9 @@ qt_add_qml_module(appUBST2508_Sheduler
         src/models/daylistmodel.h src/models/daylistmodel.cpp
         src/entities/day.h src/entities/day.cpp
         src/models/deadlinelistmodel.h src/models/deadlinelistmodel.cpp
+        QML_FILES ui/components/SubjectPopup.qml
+        QML_FILES ui/components/FileCard.qml
+        SOURCES src/models/filelistmodel.h src/models/filelistmodel.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -13,6 +13,7 @@ public:
     enum LessonRoles
     {
         SubjectNameRole = Qt::UserRole + 1,
+        SubjectObjectRole,
         LessonTypeRole,
         LessonTypeNameRole,
         LessonStartTimeRole,

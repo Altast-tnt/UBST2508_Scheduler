@@ -96,7 +96,7 @@ public:
 
 private:
     QString m_name;
-    QString m_path;
+    QString m_path = "";
     FileType m_type = MAX_TYPES;
 
 signals:
@@ -129,17 +129,17 @@ inline QString File::icon() const
     switch (m_type) {
     case File::DOCX:
     case File::DOC:
-        return ":/assets/icons/docx.svg";
+        return "../../assets/icons/docx.svg";
     case File::PDF:
-        return ":/assets/icons/pdf.svg";
+        return "../../assets/icons/pdf.svg";
     case File::PPT:
     case File::PPTX:
-        return ":/assets/icons/pptx.svg";
+        return "../../assets/icons/pptx.svg";
     case File::XLS:
     case File::XLSX:
-        return ":/assets/icons/xls.svg";
+        return "../../assets/icons/xls.svg";
     default:
-        return ":/assets/icons/file.svg";
+        return "../../assets/icons/file.svg";
     }
 }
 
