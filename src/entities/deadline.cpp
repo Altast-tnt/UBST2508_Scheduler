@@ -69,3 +69,24 @@ void Deadline::setIsCompleted(bool newIsCompleted)
     m_isCompleted = newIsCompleted;
     emit isCompletedChanged();
 }
+
+QString Deadline::typeName() const
+{
+    switch(m_type)
+    {
+    case Deadline::PR:
+        return "Практическая работа";
+    case Deadline::KR:
+        return "Контрольная работа";
+    case Deadline::PRESENTATION:
+        return "Презентация";
+    case Deadline::DOKLAD:
+        return "Доклад";
+    case Deadline::REFERAT:
+        return "Реферат";
+    case Deadline::LAB:
+        return "Лабораторная работа";
+    default:
+        return "Задание";
+    }
+}

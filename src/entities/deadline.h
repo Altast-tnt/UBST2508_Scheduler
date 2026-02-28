@@ -27,6 +27,7 @@ class Deadline : public QObject
 
     Q_PROPERTY(Subject* subject READ subject WRITE setSubject NOTIFY subjectChanged FINAL)
     Q_PROPERTY(DeadlineType type READ type WRITE setType NOTIFY typeChanged FINAL)
+    Q_PROPERTY(QString typeName READ typeName NOTIFY typeChanged)
     Q_PROPERTY(QDateTime dateTime READ dateTime WRITE setDateTime NOTIFY dateTimeChanged FINAL)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged FINAL)
     Q_PROPERTY(bool isCompleted READ isCompleted WRITE setIsCompleted NOTIFY isCompletedChanged FINAL)
@@ -47,6 +48,8 @@ class Deadline : public QObject
 
     bool isCompleted() const;
     void setIsCompleted(bool newIsCompleted);
+
+    QString typeName() const;
 
 signals:
     void subjectChanged();

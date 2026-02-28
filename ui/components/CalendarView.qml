@@ -106,7 +106,7 @@ ColumnLayout {
                     height: 22
                     radius: 6
 
-                    color: model.deadlineIsCompletedRole ? Theme.accentGreen : Theme.accentRed
+                    color: model.deadlineIsCompleted ? Theme.accentGreen : Theme.accentRed
 
                     Text {
 
@@ -212,19 +212,10 @@ ColumnLayout {
 
                     sName: model.subjectName
 
-                    dTime: "До " + Qt.formatTime(model.deadlineDateTimeRole,
+                    dTime: "До " + Qt.formatTime(model.deadlineDateTime,
                                                  "hh:mm")
-                    // TODO: Вынести определение enum в текст в отдельный метод класса
-                    dType: {
-                        if (model.deadlineTypesRole === 0)
-                            return "Практика"
-                        if (model.deadlineTypesRole === 1)
-                            return "Контрольная"
-                        if (model.deadlineTypesRole === 2)
-                            return "Презентация"
-                        return "Задание"
-                    }
-                    isCompleted: model.deadlineIsCompletedRole
+                    dType: model.deadlineTypeName
+                    isCompleted: model.deadlineIsCompleted
                 }
                 visible: count > 0
             }

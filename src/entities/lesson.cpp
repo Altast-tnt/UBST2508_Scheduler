@@ -69,3 +69,30 @@ void Lesson::setDate(const QDate &newDate)
     m_date = newDate;
     emit dateChanged();
 }
+
+QString Lesson::typeName() const
+{
+    switch(m_type)
+    {
+    case Lesson::LECTION:
+        return "Лекция";
+    case Lesson::PRAKTIK:
+        return "Практическое занятие";
+    case Lesson::LAB:
+        return "Лабораторное занятие";
+    case Lesson::KONTROL:
+        return "Контрольное занятие";
+    case Lesson::EXAM:
+    {
+        if (m_subject)
+        {
+            return m_subject->typeName();
+        }
+        return "Экзамен/Зачет";
+    }
+    case Lesson::RETAKE:
+        return "Пересдача";
+    default:
+        return "Занятие";
+    }
+}

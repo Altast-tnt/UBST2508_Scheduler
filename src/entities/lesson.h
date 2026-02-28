@@ -23,6 +23,7 @@ public:
     Q_ENUM(LessonType);
 
     Q_PROPERTY(LessonType type READ type WRITE setType NOTIFY typeChanged FINAL)
+    Q_PROPERTY(QString typeName READ typeName NOTIFY typeChanged)
     Q_PROPERTY(Subject* subject READ subject WRITE setSubject NOTIFY subjectChanged FINAL)
     Q_PROPERTY(QTime startTime READ startTime WRITE setStartTime NOTIFY startTimeChanged FINAL)
     Q_PROPERTY(QTime endTime READ endTime WRITE setEndTime NOTIFY endTimeChanged FINAL)
@@ -45,6 +46,8 @@ public:
 
     QDate date() const;
     void setDate(const QDate &newDate);
+
+    QString typeName() const;
 
 signals:
     void typeChanged();

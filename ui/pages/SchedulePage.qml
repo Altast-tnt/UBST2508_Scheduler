@@ -13,15 +13,7 @@ DayBoard {
                                  "hh:mm") + " - " + Qt.formatTime(
                        lessonEndTime, "hh:mm")
 
-            lType: {
-                if (lessonType === 0)
-                    return "Лекция"
-                if (lessonType === 1)
-                    return "Практика"
-                if (lessonType === 2)
-                    return "Лабораторная"
-                return "Занятие"
-            }
+            lType: lessonTypeName
         }
     }
 }

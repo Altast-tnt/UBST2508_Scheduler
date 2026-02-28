@@ -84,3 +84,31 @@ void Subject::setDeadlines(const QList<Deadline *> &newDeadlines)
     m_deadlines = newDeadlines;
     emit deadlinesChanged();
 }
+
+Subject::SubjectType Subject::type() const
+{
+    return m_type;
+}
+
+void Subject::setType(const SubjectType newType)
+{
+    if (m_type == newType)
+        return;
+    m_type = newType;
+    emit typeChanged();
+}
+
+QString Subject::typeName() const
+{
+    switch(m_type)
+    {
+    case Subject::EXAM:
+        return "Экзамен";
+    case Subject::CREDIT:
+        return "Зачет";
+    case Subject::CREDITWITHGRADE:
+        return "Зачет с оценкой";
+    default:
+        return "Итоговая работа";
+    }
+}

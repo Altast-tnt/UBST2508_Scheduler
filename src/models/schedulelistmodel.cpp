@@ -26,6 +26,8 @@ QVariant ScheduleListModel::data(const QModelIndex &index, int role) const
         return (lesson->subject()) ? lesson->subject()->name() : QVariant();
     case LessonTypeRole:
         return lesson->type();
+    case LessonTypeNameRole:
+        return lesson->typeName();
     case LessonStartTimeRole:
         return lesson->startTime();
     case LessonEndTimeRole:
@@ -42,6 +44,7 @@ QHash<int, QByteArray> ScheduleListModel::roleNames() const
     QHash<int, QByteArray> roles;
     roles[SubjectNameRole] = "subjectName";
     roles[LessonTypeRole] = "lessonType";
+    roles[LessonTypeNameRole] = "lessonTypeName";
     roles[LessonStartTimeRole] = "lessonStartTime";
     roles[LessonEndTimeRole] = "lessonEndTime";
     roles[LessonDateRole] = "lessonDate";

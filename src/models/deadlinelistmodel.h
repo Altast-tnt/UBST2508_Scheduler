@@ -15,6 +15,7 @@ public:
     {
         SubjectNameRole = Qt::UserRole + 1,
         DeadlineTypesRole,
+        DeadlineTypeNameRole,
         DeadlineDateTimeRole,
         DeadlineIsCompletedRole
     };

@@ -14,6 +14,7 @@ public:
     {
         SubjectNameRole = Qt::UserRole + 1,
         LessonTypeRole,
+        LessonTypeNameRole,
         LessonStartTimeRole,
         LessonEndTimeRole,
         LessonDateRole
