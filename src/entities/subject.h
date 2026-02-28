@@ -29,7 +29,6 @@ public:
     Q_PROPERTY(QList<File*> files READ files WRITE setFiles NOTIFY filesChanged FINAL)
     Q_PROPERTY(QList<Deadline*> deadlines READ deadlines WRITE setDeadlines NOTIFY deadlinesChanged FINAL)
 
-
     explicit Subject(QObject *parent = nullptr);
 
     QString name() const;
@@ -45,12 +44,13 @@ public:
 
     QList<Deadline *> deadlines() const;
     void setDeadlines(const QList<Deadline *> &newDeadlines);
-    // TODO: добавление одиночного дедлайна
+    void addDeadline(Deadline *deadline);
 
     SubjectType type() const;
     void setType(const SubjectType newType);
 
     QString typeName() const;
+
 
 signals:
     void nameChanged();

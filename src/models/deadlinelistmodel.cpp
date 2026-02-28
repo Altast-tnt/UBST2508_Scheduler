@@ -1,4 +1,5 @@
 #include "deadlinelistmodel.h"
+#include <algorithm>
 
 DeadlineListModel::DeadlineListModel(QObject *parent)
 {}
@@ -34,6 +35,8 @@ QVariant DeadlineListModel::data(const QModelIndex &index, int role) const
         return deadline->dateTime();
     case DeadlineIsCompletedRole:
         return deadline->isCompleted();
+    case DeadlineDateOnlyRole:
+        return deadline->dateTime().date();
     default:
         return QVariant();
     }
@@ -48,6 +51,7 @@ QHash<int, QByteArray> DeadlineListModel::roleNames() const
     roles[DeadlineTypeNameRole] = "deadlineTypeName";
     roles[DeadlineDateTimeRole] = "deadlineDateTime";
     roles[DeadlineIsCompletedRole] = "deadlineIsCompleted";
+    roles[DeadlineDateOnlyRole] = "deadlineDateOnly";
 
     return roles;
 }
@@ -56,5 +60,6 @@ void DeadlineListModel::setDeadlines(const QList<Deadline *> &deadlines)
 {
     beginResetModel();
     m_deadlines = deadlines;
+    std::sort(m_deadlines.begin(), m_deadlines.end(), [] (Deadline* a, Deadline* b) { return a->dateTime() < b->dateTime(); });
     endResetModel();
 }

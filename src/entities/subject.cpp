@@ -1,4 +1,5 @@
 #include "subject.h"
+#include "deadline.h"
 
 Subject::Subject(QObject *parent)
     : QObject{parent}
@@ -85,6 +86,25 @@ void Subject::setDeadlines(const QList<Deadline *> &newDeadlines)
     emit deadlinesChanged();
 }
 
+void Subject::addDeadline(Deadline *deadline)
+{
+    if (!deadline) return;
+
+    for (auto existingDeadline : std::as_const(m_deadlines)) {
+
+        if (existingDeadline->dateTime() == deadline->dateTime() &&
+            existingDeadline->description() == deadline->description()) {
+            return;
+        }
+
+    }
+
+    deadline->setSubject(this);
+
+    m_deadlines.append(deadline);
+    emit deadlinesChanged();
+}
+
 Subject::SubjectType Subject::type() const
 {
     return m_type;
@@ -112,3 +132,4 @@ QString Subject::typeName() const
         return "Итоговая работа";
     }
 }
+

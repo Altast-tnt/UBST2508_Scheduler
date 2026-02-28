@@ -23,6 +23,7 @@ class Appcore : public QObject
     Q_PROPERTY(DayListModel* dayListModel READ dayListModel WRITE setDayListModel NOTIFY dayListModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* deadlineModel READ deadlineModel WRITE setDeadlineModel NOTIFY deadlineModelChanged FINAL)
     Q_PROPERTY(FileListModel* fileModel READ fileModel WRITE setFileModel NOTIFY fileModelChanged FINAL)
+    Q_PROPERTY(DeadlineListModel* subjectDeadlinesModel READ subjectDeadlinesModel CONSTANT)
 
 public:
     explicit Appcore(QObject *parent = nullptr);
@@ -47,8 +48,10 @@ public:
     FileListModel *fileModel() const;
     void setFileModel(FileListModel *newFileModel);
 
-     DayListModel *dayListModel() const;
-     void setDayListModel(DayListModel *newDayListModel);
+    DayListModel *dayListModel() const;
+    void setDayListModel(DayListModel *newDayListModel);
+
+    DeadlineListModel* subjectDeadlinesModel() const;
 
  signals:
     void currentSubjectChanged();
@@ -72,6 +75,7 @@ private:
     DeadlineListModel *m_deadlineModel = nullptr;
     FileListModel *m_fileModel = nullptr;
     DayListModel *m_dayListModel = nullptr;
+    DeadlineListModel *m_subjectDeadlinesModel = nullptr;
 };
 
 #endif // APPCORE_H

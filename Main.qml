@@ -122,4 +122,7 @@ Window {
     DeadlinePopup {
         id: globalDeadlinePopup
     }
+    SubjectDeadlinesPopup {
+        id: globalSubjectDeadlinesPopup
+    }
 }

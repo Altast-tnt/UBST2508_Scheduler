@@ -66,7 +66,18 @@ Popup {
             text: "Дедлайны по предмету"
             font.family: Theme.fontFamily
             font.pixelSize: Theme.baseSize
-            color: Theme.accentBlue
+            color: (deadlinesTextMouseArea.containsMouse) ? Theme.textSecondary : Theme.accentBlue
+
+            MouseArea {
+                id: deadlinesTextMouseArea
+                hoverEnabled: true
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    rootPopup.close()
+                    globalSubjectDeadlinesPopup.open()
+                }
+            }
         }
 
         Text {

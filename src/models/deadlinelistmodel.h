@@ -18,7 +18,8 @@ public:
         DeadlineTypesRole,
         DeadlineTypeNameRole,
         DeadlineDateTimeRole,
-        DeadlineIsCompletedRole
+        DeadlineIsCompletedRole,
+        DeadlineDateOnlyRole
     };
 
     explicit DeadlineListModel(QObject *parent = nullptr);

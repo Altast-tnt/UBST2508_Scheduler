@@ -7,6 +7,7 @@ Appcore::Appcore(QObject *parent)
 {
     m_dayListModel = new DayListModel(this);
     m_fileModel = new FileListModel(this);
+    m_subjectDeadlinesModel = new DeadlineListModel(this);
 }
 
 void Appcore::loadTestData()
@@ -82,7 +83,9 @@ void Appcore::loadTestData()
             d1->setType(Deadline::PR);
             d1->setDateTime(QDateTime(currentDate, QTime(23, 59)));
             d1->setIsCompleted(false);
+            math->addDeadline(d1);
             deadlineListDay.append(d1);
+
 
             File* labTask = new File("Задание на лабу", "../../lab1.pdf", File::PDF, this);
 
@@ -97,7 +100,21 @@ void Appcore::loadTestData()
 • не менее 10 страниц А4
 • наличие оглавления и титульного листа (не входят в количество страниц)
 Прикрепить готовую работу в ЛМС)");
+            history->addDeadline(d2);
             deadlineListDay.append(d2);
+
+            File* labTask2 = new File("Задание на лабу222", "../../lab2.pdf", File::PDF, this);
+
+            Deadline* d4 = new Deadline(day);
+            d4->setSubject(history);
+            d4->setType(Deadline::LAB);
+            d4->setDateTime(QDateTime(currentDate, QTime(12, 59)));
+            d4->setIsCompleted(false);
+            d4->addFile(labTask2);
+            d4->setDescription(R"(Из прикрепленного файла взять по вариантам задание и подготовить реферат, правила оформления:
+Прикрепить готовую работу в ЛМС)");
+            history->addDeadline(d4);
+            deadlineListDay.append(d4);
 
 
 
@@ -150,11 +167,22 @@ void Appcore::setCurrentSubject(Subject *newCurrentSubject)
 {
     if (m_currentSubject == newCurrentSubject)
         return;
+
     m_currentSubject = newCurrentSubject;
 
-    if (m_currentSubject && m_fileModel) {
-        m_fileModel->setFiles(m_currentSubject->files());
+    if (m_currentSubject) {
+        if (m_fileModel) {
+            m_fileModel->setFiles(m_currentSubject->files());
+        }
+
+        if (m_subjectDeadlinesModel) {
+            m_subjectDeadlinesModel->setDeadlines(m_currentSubject->deadlines());
+        }
+    } else {
+        if (m_fileModel) m_fileModel->setFiles({});
+        if (m_subjectDeadlinesModel) m_subjectDeadlinesModel->setDeadlines({});
     }
+
     emit currentSubjectChanged();
 }
 
@@ -244,3 +272,10 @@ void Appcore::setDayListModel(DayListModel *newDayListModel)
     m_dayListModel = newDayListModel;
     emit dayListModelChanged();
 }
+
+DeadlineListModel *Appcore::subjectDeadlinesModel() const
+{
+     return m_subjectDeadlinesModel;
+}
+
+
