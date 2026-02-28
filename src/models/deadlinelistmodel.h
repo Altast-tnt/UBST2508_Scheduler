@@ -14,6 +14,7 @@ public:
     enum DeadlineRoles
     {
         SubjectNameRole = Qt::UserRole + 1,
+        DeadlineObjectRole,
         DeadlineTypesRole,
         DeadlineTypeNameRole,
         DeadlineDateTimeRole,

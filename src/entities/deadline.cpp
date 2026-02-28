@@ -90,3 +90,30 @@ QString Deadline::typeName() const
         return "Задание";
     }
 }
+
+QList<File *> Deadline::files() const
+{
+    return m_files;
+}
+
+void Deadline::setFiles(const QList<File *> &newFiles)
+{
+    if (m_files == newFiles)
+        return;
+    m_files = newFiles;
+    emit filesChanged();
+}
+
+void Deadline::addFile(File *file)
+{
+    if (!file) return;
+    for (auto f : std::as_const(m_files))
+    {
+        if (f->path() == file->path())
+        {
+            return;
+        }
+    }
+    m_files.append(file);
+    emit filesChanged();
+}

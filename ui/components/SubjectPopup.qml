@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+// TODO: Подумать надо ли делать общий шаблон popup
 Popup {
     id: rootPopup
 

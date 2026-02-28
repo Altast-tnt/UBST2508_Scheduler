@@ -4,14 +4,14 @@ import QtQuick.Layouts
 Rectangle {
     id: deadlineCard
     radius: 10
-    color: Theme.surface
+    color: (cardMouseArea.containsMouse) ? Theme.background : Theme.surface
     implicitWidth: 260
     implicitHeight: layoutTexts.implicitHeight + 32
 
     property string sName: "Основы российской государственности"
     property string dType: "Презентация"
     property string dTime: "до 09:00"
-    property bool isCompleted: false
+    property var deadlineObj: model.deadlineObject
 
     ColumnLayout {
         id: layoutTexts
@@ -37,7 +37,8 @@ Rectangle {
                 radius: 100
                 implicitHeight: Theme.headerButtonSize * 0.4
                 implicitWidth: Theme.headerButtonSize * 0.4
-                color: isCompleted ? Theme.accentGreen : Theme.accentRed
+                color: (deadlineObj
+                        && deadlineObj.isCompleted) ? Theme.accentGreen : Theme.accentRed
             }
         }
 
@@ -59,6 +60,17 @@ Rectangle {
                 pixelSize: Theme.fontSizeSmall
             }
             color: Theme.accentBlue
+        }
+    }
+
+    MouseArea {
+        id: cardMouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        onClicked: {
+            appcore.currentDeadline = model.deadlineObject
+
+            globalDeadlinePopup.open()
         }
     }
 }

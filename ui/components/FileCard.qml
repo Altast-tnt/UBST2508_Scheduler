@@ -6,6 +6,7 @@ Rectangle {
     id: rootFileCard
     implicitHeight: 60
     color: Theme.surface
+    radius: 5
 
     Rectangle {
         anchors.bottom: parent.bottom
@@ -25,9 +26,10 @@ Rectangle {
         spacing: 15
 
         Image {
+            // TODO: проверить размерность на разных устройствах
             source: rootFileCard.imageSource
-            Layout.preferredWidth: 32
-            Layout.preferredHeight: 32
+            Layout.preferredWidth: 40
+            Layout.preferredHeight: 40
             verticalAlignment: Qt.AlignVCenter
         }
 
@@ -56,7 +58,7 @@ Rectangle {
 
         RoundButton {
             Layout.alignment: Qt.AlignVCenter
-
+            // TODO: проверить размерность на разных устройствах
             icon.source: "../../assets/icons/download.svg"
             icon.color: Theme.textPrimary
             icon.width: 24

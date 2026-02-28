@@ -35,7 +35,6 @@ ColumnLayout {
                                                  "hh:mm") + " - Подробнее"
 
                     dType: deadlineTypeName
-                    isCompleted: deadlineIsCompleted
                 }
             }
         }

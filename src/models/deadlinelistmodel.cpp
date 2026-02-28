@@ -24,6 +24,8 @@ QVariant DeadlineListModel::data(const QModelIndex &index, int role) const
     {
     case SubjectNameRole:
         return (deadline->subject()) ? deadline->subject()->name() : QVariant();
+    case DeadlineObjectRole:
+        return QVariant::fromValue(deadline);
     case DeadlineTypesRole:
         return deadline->type();
     case DeadlineTypeNameRole:
@@ -41,6 +43,7 @@ QHash<int, QByteArray> DeadlineListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[SubjectNameRole] = "subjectName";
+    roles[DeadlineObjectRole] = "deadlineObject";
     roles[DeadlineTypesRole] = "deadlineTypes";
     roles[DeadlineTypeNameRole] = "deadlineTypeName";
     roles[DeadlineDateTimeRole] = "deadlineDateTime";

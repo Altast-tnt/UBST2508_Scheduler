@@ -84,11 +84,19 @@ void Appcore::loadTestData()
             d1->setIsCompleted(false);
             deadlineListDay.append(d1);
 
+            File* labTask = new File("Задание на лабу", "../../lab1.pdf", File::PDF, this);
+
             Deadline* d2 = new Deadline(day);
             d2->setSubject(history);
             d2->setType(Deadline::KR);
             d2->setDateTime(QDateTime(currentDate, QTime(23, 59)));
             d2->setIsCompleted(true);
+            d2->addFile(labTask);
+            d2->setDescription(R"(Из прикрепленного файла взять по вариантам задание и подготовить реферат, правила оформления:
+• 14 пт Times New Roman
+• не менее 10 страниц А4
+• наличие оглавления и титульного листа (не входят в количество страниц)
+Прикрепить готовую работу в ЛМС)");
             deadlineListDay.append(d2);
 
 
@@ -160,6 +168,15 @@ void Appcore::setCurrentDeadline(Deadline *newCurrentDeadline)
     if (m_currentDeadline == newCurrentDeadline)
         return;
     m_currentDeadline = newCurrentDeadline;
+
+    if (m_currentDeadline) {
+        m_currentSubject = m_currentDeadline->subject();
+        emit currentSubjectChanged();
+
+        if (m_fileModel) {
+            m_fileModel->setFiles(m_currentDeadline->files());
+        }
+    }
     emit currentDeadlineChanged();
 }
 

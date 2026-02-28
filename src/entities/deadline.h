@@ -31,6 +31,7 @@ class Deadline : public QObject
     Q_PROPERTY(QDateTime dateTime READ dateTime WRITE setDateTime NOTIFY dateTimeChanged FINAL)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged FINAL)
     Q_PROPERTY(bool isCompleted READ isCompleted WRITE setIsCompleted NOTIFY isCompletedChanged FINAL)
+    Q_PROPERTY(QList<File*> files READ files WRITE setFiles NOTIFY filesChanged FINAL)
 
     explicit Deadline(QObject *parent = nullptr);
 
@@ -51,6 +52,10 @@ class Deadline : public QObject
 
     QString typeName() const;
 
+    QList<File *> files() const;
+    void setFiles(const QList<File *> &newFiles);
+    void addFile(File *file);
+
 signals:
     void subjectChanged();
     void typeChanged();
@@ -61,12 +66,15 @@ signals:
 
     void isCompletedChanged();
 
+    void filesChanged();
+
 private:
     Subject *m_subject = nullptr;
     DeadlineType m_type = MAX_DEADLINETYPE;
     QDateTime m_dateTime;
     QString m_description;
     bool m_isCompleted = false;
+    QList<File *> m_files;
 };
 
 #endif // DEADLINE_H

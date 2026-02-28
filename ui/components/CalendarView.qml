@@ -102,11 +102,13 @@ ColumnLayout {
                 model: (dayCell.dayObject
                         && dayCell.dayObject.dailyDeadlines) ? dayCell.dayObject.dailyDeadlines : null
                 delegate: Rectangle {
+                    property var deadlineObj: model.deadlineObject
                     width: ListView.view.width
                     height: 22
                     radius: 6
 
-                    color: model.deadlineIsCompleted ? Theme.accentGreen : Theme.accentRed
+                    color: (deadlineObj
+                            && deadlineObj.isCompleted) ? Theme.accentGreen : Theme.accentRed
 
                     Text {
 
@@ -215,7 +217,6 @@ ColumnLayout {
                     dTime: "До " + Qt.formatTime(model.deadlineDateTime,
                                                  "hh:mm")
                     dType: model.deadlineTypeName
-                    isCompleted: model.deadlineIsCompleted
                 }
                 visible: count > 0
             }
