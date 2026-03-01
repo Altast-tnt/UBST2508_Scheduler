@@ -2,6 +2,21 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+
+/*!
+    \qmltype CalendarView
+    \inherits ColumnLayout
+    \brief Компонент календаря для отображения и выбора дедлайнов.
+
+    Этот компонент отображает сетку месяца, позволяет переключаться между месяцами
+    и просматривать список задач (дедлайнов) на конкретный день во всплывающем окне.
+
+    Требует наличия глобальных объектов:
+    \list
+        \li \c Theme - объект с настройками цветов и шрифтов.
+        \li \c appcore.dayListModel - C++ модель для получения данных о днях.
+    \endlist
+*/
 ColumnLayout {
     id: rootLayout
 
@@ -10,8 +25,18 @@ ColumnLayout {
 
     spacing: 10
 
+
+    /*!
+        \qmlproperty date CalendarView::baseDate
+        Дата, определяющая текущий отображаемый месяц. Изменяется при навигации.
+    */
     property date baseDate: new Date()
 
+
+    /*!
+        \qmlproperty list<string> CalendarView::monthNames
+        Массив локализованных названий месяцев.
+    */
     property var monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
 
     RowLayout {
@@ -63,6 +88,7 @@ ColumnLayout {
         delegate: Rectangle {
             id: dayCell
 
+            // получаем данные для конкретной даты
             property var dayObject: appcore.dayListModel.getDay(model.date)
 
             color: cellMouseArea.containsMouse ? Theme.accentBlue : Theme.surface
@@ -85,6 +111,7 @@ ColumnLayout {
                 z: 2
             }
 
+            // Список дедлайнов внутри ячейки дня
             ListView {
                 anchors {
                     top: parent.top
@@ -98,7 +125,7 @@ ColumnLayout {
                 spacing: 4
                 clip: true
                 interactive: false
-
+                // Проверка на существование данных перед биндингом модели
                 model: (dayCell.dayObject
                         && dayCell.dayObject.dailyDeadlines) ? dayCell.dayObject.dailyDeadlines : null
                 delegate: Rectangle {
@@ -144,7 +171,7 @@ ColumnLayout {
                 hoverEnabled: true
 
                 onClicked: {
-
+                    // передаем данные из модели в попап
                     detailsPopup.dateTitle = model.date.toLocaleDateString(
                                 Qt.locale("ru_RU"), "d MMMM yyyy")
 
@@ -158,6 +185,12 @@ ColumnLayout {
         }
     }
 
+
+    /*!
+        \internal
+        Окно с подробным списком дедлайнов для выбранного дня.
+        Вызывается при клике на ячейку календаря.
+    */
     Popup {
         id: detailsPopup
 
@@ -170,7 +203,9 @@ ColumnLayout {
 
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
+        // Модель данных для ListView внутри попапа
         property var currentModel: null
+        // Заголовок даты в формате "1 Марта 2026"
         property string dateTitle: ""
 
         background: Rectangle {

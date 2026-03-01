@@ -1,16 +1,51 @@
 import QtQuick
 import QtQuick.Layouts
 
+
+/*!
+    \qmltype DeadlineCard
+    \inherits Rectangle
+    \brief Визуальная карточка для отображения краткой информации о дедлайне.
+
+    Карточка отображает название предмета, тип работы, время выполнения и
+    цветовой индикатор статуса (выполнено/не выполнено).
+
+    При клике на карточку происходит:
+    \list
+        \li Установка текущего дедлайна в \c appcore.currentDeadline.
+        \li Открытие глобального попапа подробностей \c globalDeadlinePopup.
+    \endlist
+
+    Зависимости:
+    \list
+        \li \c Theme - глобальный объект стилизации.
+        \li \c appcore - объект логики (C++), содержащий свойство \c currentDeadline.
+        \li \c globalDeadlinePopup - глобально доступный компонент \c Popup.
+    \endlist
+*/
 Rectangle {
     id: deadlineCard
     radius: 10
+    // Интерактивная смена фона при наведении
     color: (cardMouseArea.containsMouse) ? Theme.background : Theme.surface
     implicitWidth: 260
     implicitHeight: layoutTexts.implicitHeight + 32
 
+    /*! \qmlproperty string DeadlineCard::sName Название учебного предмета. */
     property string sName: "Основы российской государственности"
+
+    /*! \qmlproperty string DeadlineCard::dType Тип задания (напр. "Презентация", "Курсовая"). */
     property string dType: "Презентация"
+
+    /*! \qmlproperty string DeadlineCard::dTime Текст со временем дедлайна (напр. "до 09:00"). */
     property string dTime: "до 09:00"
+
+
+    /*!
+        \qmlproperty var DeadlineCard::deadlineObj
+        Ссылка на объект данных дедлайна из модели.
+        Используется для получения статуса завершенности (\c isCompleted).
+    */
     property var deadlineObj: model.deadlineObject
 
     ColumnLayout {
@@ -19,6 +54,7 @@ Rectangle {
         anchors.margins: 12
         spacing: 10
 
+        // Название предмета и индикатор статуса
         RowLayout {
             Text {
                 id: subjectName
@@ -31,6 +67,8 @@ Rectangle {
                 }
                 color: Theme.textPrimary
             }
+
+            /*! \internal Индикатор статуса: зеленый - выполнено, красный - просрочено/в процессе. */
             Rectangle {
                 id: indicator
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -42,6 +80,7 @@ Rectangle {
             }
         }
 
+        // Подзаголовок: тип дедлайна
         Text {
             id: deadlineType
             text: dType
@@ -52,6 +91,7 @@ Rectangle {
             color: Theme.textSecondary
         }
 
+        // Время дедлайна (выделено акцентным цветом)
         Text {
             id: deadlineTime
             text: dTime
@@ -68,8 +108,9 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: {
+            // Передаем данные в логику приложения для отображения подробностей
             appcore.currentDeadline = model.deadlineObject
-
+            // Вызываем глобальный попап
             globalDeadlinePopup.open()
         }
     }

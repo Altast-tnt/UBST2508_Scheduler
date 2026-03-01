@@ -2,17 +2,34 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-// TODO: Подумать надо ли делать общий шаблон popup
+
+/*!
+    \qmltype DeadlinePopup
+    \inherits Popup
+    \brief Окно подробной информации о выбранном дедлайне.
+
+    Попап отображает детальную информацию, привязанную к \c appcore.currentDeadline.
+    Включает в себя:
+    \list
+        \li Название предмета и Email преподавателя.
+        \li Дату и время дедлайна.
+        \li Интерактивный переключатель статуса выполнения.
+        \li Текстовое описание задачи.
+        \li Список прикрепленных файлов через \c FileCard.
+    \endlist
+
+    \note Попап автоматически обновляет данные при изменении \c appcore.currentDeadline.
+    \note Использует \c appcore.fileModel для отображения списка файлов.
+*/
 Popup {
     id: rootPopup
 
+    // Конфигурация окна
     anchors.centerIn: parent
     width: parent.width * 0.6
     height: parent.height * 0.8
-
     modal: true
     focus: true
-
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
     background: Rectangle {
@@ -27,6 +44,7 @@ Popup {
         anchors.margins: 20
         spacing: 15
 
+        // Название предмета
         Text {
             Layout.fillWidth: true
             text: appcore.currentSubject ? appcore.currentSubject.name : ""
@@ -35,6 +53,7 @@ Popup {
             color: Theme.textPrimary
         }
 
+        // Блок информации о преподавателе
         RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -47,6 +66,7 @@ Popup {
             }
 
             Text {
+                /*! \internal Логика извлечения email первого преподавателя из списка предмета */
                 property var teacher: (appcore.currentSubject
                                        && appcore.currentSubject.teachers.length
                                        > 0) ? appcore.currentSubject.teachers[0] : null
@@ -57,6 +77,7 @@ Popup {
             }
         }
 
+        // Блок даты дедлайна
         RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -78,6 +99,7 @@ Popup {
             }
         }
 
+        // Блок статуса выполнения (CheckBox)
         RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -94,6 +116,7 @@ Popup {
                 id: control
                 Layout.alignment: Qt.AlignTop
                 checked: appcore.currentDeadline ? appcore.currentDeadline.isCompleted : false
+                // Прямая запись состояния в C++ модель
                 onToggled: {
                     if (appcore.currentDeadline) {
                         appcore.currentDeadline.isCompleted = checked
@@ -101,6 +124,7 @@ Popup {
                 }
                 text: ""
 
+                /*! \internal Кастомный стиль индикатора CheckBox */
                 indicator: Rectangle {
                     implicitWidth: 20
                     implicitHeight: 20
@@ -121,6 +145,7 @@ Popup {
             }
         }
 
+        // Блок описания дедлайна
         RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -163,6 +188,7 @@ Popup {
             color: Theme.textPrimary
         }
 
+        // Список прикрепленных файлов
         ListView {
             id: popupList
             Layout.fillWidth: true
@@ -170,6 +196,7 @@ Popup {
             clip: true
             spacing: 10
 
+            // Ожидается модель файлов из C++
             model: appcore.fileModel
 
             delegate: FileCard {
@@ -177,6 +204,7 @@ Popup {
                 width: popupList.width
                 height: 60
 
+                // Роли модели: fileIcon, fileName, filePath
                 imageSource: fileIcon
                 fName: fileName
                 fPath: filePath
