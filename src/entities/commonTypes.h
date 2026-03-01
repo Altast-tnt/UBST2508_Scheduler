@@ -3,20 +3,46 @@
 #include <QObject>
 #include <QString>
 
-
+/**
+ * @class Teacher
+ * @brief Сущность преподавателя
+ * Класс для хранения информации по преподавателю
+ */
 class Teacher : public QObject
 {
     Q_OBJECT
 
+    /**
+     * @brief ФИО преподавателя
+     */
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
+    /**
+     * @brief Почта преподавателя
+     */
     Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged FINAL)
 
 
 public:
+    /**
+     * @brief Возвращает ФИО преподавателя, установленное в m_name
+     * @return QString
+     */
     QString name() const;
+    /**
+     * @brief Устанавливает ФИО преподавателя в m_name
+     * @param newName, константная ссылка на строку с ФИО
+     */
     void setName(const QString &newName);
 
+    /**
+     * @brief Возвращает почту преподавателя, установленное в m_email
+     * @return QString
+     */
     QString email() const;
+    /**
+     * @brief Устанавливает почту преподавателя в m_email
+     * @param newEmail, константная ссылка на строку с почтой
+     */
     void setEmail(const QString &newEmail);
 
 signals:
@@ -54,13 +80,22 @@ inline void Teacher::setName(const QString &newName)
     emit nameChanged();
 }
 
-
+/**
+ * @class File
+ * @brief Сущность файла
+ * Класс для хранения информации по файлу
+ */
 class File : public QObject
 {
     Q_OBJECT
 
 public:
 
+    /**
+    * @enum FileType
+    * @brief Перечисление возможных типов файлов
+    * На основе данного перечисления устанавливаются заранее подготовленные иконки
+    */
     enum FileType
     {
         DOCX,
@@ -75,23 +110,71 @@ public:
 
     Q_ENUM(FileType)
 
+    /**
+     * @brief Конструктор класса
+     * Инициализирует:
+     * - m_name
+     * - m_path
+     * - m_type
+     * @param name, наименование файла (без типа файла)
+     * @param path, полный путь файла после скачивания
+     * @param type, тип файла из перечисления FileType
+     * @param parent, указатель на родительский объект QObject
+     */
     File(QString name, QString path, FileType type, QObject *parent = nullptr)
         : QObject(parent), m_name(name), m_path(path), m_type(type)
     {}
 
+    /**
+     * @brief Наименование файла
+     */
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
+    /**
+     * @brief Путь к иконке (определяется программно)
+     */
     Q_PROPERTY(QString icon READ icon NOTIFY iconChanged FINAL)
+    /**
+     * @brief Абослютный путь к скачанному файлу
+     */
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged FINAL)
+    /**
+     * @brief Тип файла (перечисление FileType)
+     */
     Q_PROPERTY(FileType type READ type NOTIFY typeChanged FINAL)
 
+    /**
+     * @brief Возвращает наименование файла, установленное в m_name
+     * @return QString
+     */
     QString name() const;
+    /**
+     * @brief Устанавливает наименование файла в m_name
+     * @param newName, константная ссылка на строку с наименованием файла
+     */
     void setName(const QString &newName);
 
+    /**
+     * @brief Возвращает путь к иконке, установленный в m_icon
+     * Иконка определяется на основе типа файла из FileType
+     * @return QString
+     */
     QString icon() const;
 
+    /**
+     * @brief Возвращает путь к скачанному файлу, установленный в m_path
+     * @return QString
+     */
     QString path() const;
+    /**
+     * @brief Устанавливает путь к скачанному файлу в m_path
+     * @param newPath, константная ссылка на строку с путем к скачанному файлу
+     */
     void setPath(const QString &newPath);
 
+    /**
+     * @brief Возвращает тип файла, установленный в m_type
+     * @return FileType
+     */
     FileType type() const;
 
 private:

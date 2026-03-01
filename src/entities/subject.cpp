@@ -58,7 +58,6 @@ void Subject::setFiles(const QList<File *> &newFiles)
     emit filesChanged();
 }
 
-// TODO: Подумать над возможностью и логичностью реализации через шаблоны
 void Subject::addFile(File *file)
 {
     if (!file) return;
