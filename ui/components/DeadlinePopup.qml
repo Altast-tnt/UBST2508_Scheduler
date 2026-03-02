@@ -2,14 +2,34 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+
+/*!
+    \qmltype DeadlinePopup
+    \inherits BasePopup
+    \brief Окно подробной информации о дедлайне, построенное на базе \l BasePopup.
+
+    Этот компонент является конкретной реализацией всплывающего окна.
+    Он автоматически подтягивает данные из глобального объекта \c appcore:
+    \list
+        \li Заголовок окна -> \c appcore.currentSubject.name
+        \li Контент -> Подробности из \c appcore.currentDeadline
+        \li Файлы -> Модель \c appcore.fileModel
+    \endlist
+
+    \note Благодаря наследованию от \l BasePopup, весь контент (Email, описание, файлы)
+    автоматически компонуется вертикально с заданными отступами.
+*/
 BasePopup {
     id: deadlinePopup
+    // Передаем название предмета напрямую в свойство заголовка базового шаблона
     title: appcore.currentSubject ? appcore.currentSubject.name : ""
 
+    // Блок Email преподавателя
     RowLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
         spacing: 5
+
         Text {
             text: "Email: "
             font.family: Theme.fontFamily
@@ -132,6 +152,7 @@ BasePopup {
         }
     }
 
+    // Заголовок секции файлов
     Text {
         Layout.fillWidth: true
         text: "Файлы:"

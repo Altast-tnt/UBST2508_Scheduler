@@ -2,12 +2,29 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+
+/*!
+    \qmltype FileCard
+    \inherits Rectangle
+    \brief Карточка отдельного файла в списке приложений к дедлайну.
+
+    Компонент отображает иконку типа файла, его название, путь/источник
+    и кнопку для скачивания.
+
+    Обычно используется в качестве делегата для \c ListView.
+
+    Зависимости:
+    \list
+        \li \c Theme - для консистентного отображения цветов и шрифтов.
+    \endlist
+*/
 Rectangle {
     id: rootFileCard
     implicitHeight: 60
     color: Theme.surface
     radius: 5
 
+    /*! \internal Тонкая разделительная линия в нижней части карточки */
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
@@ -16,8 +33,11 @@ Rectangle {
         opacity: 0.2
     }
 
+    /*! \qmlproperty string FileCard::imageSource Ссылка на иконку (превью) типа файла. */
     property string imageSource
+    /*! \qmlproperty string FileCard::fName Имя файла для отображения. */
     property string fName
+    /*! \qmlproperty string FileCard::fPath Путь к файлу или URL для загрузки. */
     property string fPath
 
     RowLayout {
@@ -25,14 +45,20 @@ Rectangle {
         anchors.margins: 10
         spacing: 15
 
+        // Иконка типа файла
         Image {
-            // TODO: проверить размерность на разных устройствах
             source: rootFileCard.imageSource
+
+            /*
+               TODO: Рассмотреть использование Screen.devicePixelRatio
+               или адаптивных единиц для размеров иконок.
+            */
             Layout.preferredWidth: 40
             Layout.preferredHeight: 40
             verticalAlignment: Qt.AlignVCenter
         }
 
+        // Блок текстовой информации
         ColumnLayout {
             Layout.fillHeight: true
             spacing: 2
@@ -45,7 +71,9 @@ Rectangle {
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
+
             Text {
+                // Скрываем строку пути, если она пустая
                 visible: rootFileCard.fPath !== ""
                 text: rootFileCard.fPath
                 font.family: Theme.fontFamily
@@ -56,20 +84,26 @@ Rectangle {
             }
         }
 
+        // Кнопка скачивания
         RoundButton {
             Layout.alignment: Qt.AlignVCenter
-            // TODO: проверить размерность на разных устройствах
             icon.source: "../../assets/icons/download.svg"
             icon.color: Theme.textPrimary
             icon.width: 24
             icon.height: 24
 
+            // Прозрачный фон для кнопки
             background: Item {}
 
             opacity: hovered ? 0.7 : 1.0
             hoverEnabled: true
 
             onClicked: {
+
+                /*
+                   TODO: Реализовать интеграцию с C++ менеджером закачек.
+                   На данный момент выводит лог в консоль.
+                */
                 console.log("Скачиваем файл: " + rootFileCard.fName)
             }
         }

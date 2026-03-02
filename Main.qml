@@ -2,40 +2,51 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-// TODO: убрать все элементы в отдельные кастомные модули (особенно те, которые повторяются)
+
+/*!
+    \qmltype Main
+    \brief Главное окно приложения.
+
+    Здесь происходит:
+    \list
+        \li Инициализация глобальной темы и шрифтов.
+        \li Динамическая подстройка размеров под ширину окна (Responsiveness).
+        \li Объявление глобальных попапов, доступных из любой части приложения.
+        \li Навигация между основными разделами (Расписание/Дедлайны).
+    \endlist
+*/
 Window {
     id: rootWindow
     width: 1200
     height: 720
-
     minimumWidth: 640
     minimumHeight: 480
-
     visible: true
     color: Theme.background
     title: "Проверка"
 
-    Component.onCompleted: {
+    /*! \internal Функция для адаптивного изменения базового размера шрифта */
+    function updateResponsiveStyles() {
         Theme.baseSize = (width < 600) ? 14 : 16
     }
 
-    // TODO: при дальнейшей верстке протестировать на разных экранах и подобрать значения
-    onWidthChanged: {
-        Theme.baseSize = (width < 600) ? 14 : 16
-    }
+    Component.onCompleted: updateResponsiveStyles()
+    onWidthChanged: updateResponsiveStyles()
 
+    // --- Загрузка ресурсов ---
     FontLoader {
         id: fontInterMedium
         source: "assets/fonts/Inter_24pt-Medium.ttf"
         onStatusChanged: {
-            console.log("Font status:", status)
             if (status === FontLoader.Ready) {
                 Theme.fontFamily = fontInterMedium.name
-                console.log("Font status:", status)
+            } else if (status === FontLoader.Error) {
+                console.error("Ошибка загрузки шрифта Inter")
             }
         }
     }
 
+    // --- Основной макет ---
     ColumnLayout {
         id: mainContainer
 
@@ -43,10 +54,12 @@ Window {
         anchors.margins: 40
         spacing: 20
 
+        // Верхняя панель (Header)
         RowLayout {
             id: header
             Layout.fillHeight: false
 
+            // Кнопка настроек
             RoundButton {
                 id: btSettings
 
@@ -67,20 +80,24 @@ Window {
                 icon.height: Theme.headerButtonSize * 0.5
             }
 
+            // Распорка
             Item {
                 Layout.fillWidth: true
             }
 
+            // Главный переключатель разделов
             SegmentedToggle {
                 id: segmentedToggle
                 firstText: "Расписание"
                 secondText: "Дедлайны"
             }
 
+            // Распорка
             Item {
                 Layout.fillWidth: true
             }
 
+            // Кнопка смены темы (День/Ночь)
             RoundButton {
                 id: btChangeTheme
 
@@ -106,6 +123,8 @@ Window {
                 }
             }
         }
+
+        // Основной контент страниц
         StackLayout {
             id: stackLayout
             Layout.fillWidth: true
@@ -116,12 +135,26 @@ Window {
             DeadlinesPage {}
         }
     }
+
+    // --- Глобальные всплывающие окна ---
+
+
+    /*
+       Эти ID используются в карточках по всему приложению
+       через прямой доступ к корневым объектам.
+    */
+
+    /*! Глобальное окно подробностей предмета */
     SubjectPopup {
         id: globalSubjectPopup
     }
+
+    /*! Глобальное окно подробностей дедлайна */
     DeadlinePopup {
         id: globalDeadlinePopup
     }
+
+    /*! Глобальное окно списка дедлайнов по конкретному предмету */
     SubjectDeadlinesPopup {
         id: globalSubjectDeadlinesPopup
     }
