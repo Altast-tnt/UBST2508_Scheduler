@@ -191,96 +191,59 @@ ColumnLayout {
         Окно с подробным списком дедлайнов для выбранного дня.
         Вызывается при клике на ячейку календаря.
     */
-    Popup {
+    BasePopup {
         id: detailsPopup
-
-        anchors.centerIn: parent
-        width: parent.width * 0.6
-        height: parent.height * 0.8
-
-        modal: true
-        focus: true
-
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        title: dateTitle
 
         // Модель данных для ListView внутри попапа
         property var currentModel: null
         // Заголовок даты в формате "1 Марта 2026"
         property string dateTitle: ""
 
-        background: Rectangle {
-            color: Theme.background
-            radius: 30
-            border.color: Theme.textPrimary
-            border.width: 1
+        ListView {
+            id: popupList
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+            spacing: 10
+
+            model: detailsPopup.currentModel
+
+            delegate: DeadlineCard {
+                width: popupList.width
+
+                sName: model.subjectName
+
+                dTime: "До " + Qt.formatTime(model.deadlineDateTime, "hh:mm")
+                dType: model.deadlineTypeName
+            }
+            visible: count > 0
         }
 
         ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 20
-            spacing: 15
+            id: emptyState
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: popupList.count === 0
+            spacing: 10
+
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+
+            AnimatedImage {
+                source: "../../assets/images/noDeadline.gif"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignHCenter
+                playing: detailsPopup.visible && parent.visible
+            }
 
             Text {
-                text: detailsPopup.dateTitle
+                text: "На этот день дедлайнов нет"
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeLarge
-                color: Theme.textPrimary
-                Layout.alignment: Qt.AlignHCenter
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: 1
+                font.pixelSize: Theme.baseSize
                 color: Theme.textSecondary
-                opacity: 0.3
-            }
-
-            ListView {
-                id: popupList
-                Layout.fillWidth: true
                 Layout.fillHeight: true
-                clip: true
-                spacing: 10
-
-                model: detailsPopup.currentModel
-
-                delegate: DeadlineCard {
-                    width: popupList.width
-
-                    sName: model.subjectName
-
-                    dTime: "До " + Qt.formatTime(model.deadlineDateTime,
-                                                 "hh:mm")
-                    dType: model.deadlineTypeName
-                }
-                visible: count > 0
-            }
-
-            ColumnLayout {
-                id: emptyState
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                visible: popupList.count === 0
-                spacing: 10
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
-                AnimatedImage {
-                    source: "../../assets/images/noDeadline.gif"
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.alignment: Qt.AlignHCenter
-                    playing: detailsPopup.visible && parent.visible
-                }
-
-                Text {
-                    text: "На этот день дедлайнов нет"
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.baseSize
-                    color: Theme.textSecondary
-                    Layout.fillHeight: true
-                    Layout.alignment: Qt.AlignHCenter
-                }
+                Layout.alignment: Qt.AlignHCenter
             }
         }
     }
