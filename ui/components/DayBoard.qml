@@ -53,7 +53,7 @@ Item {
     property int columnsCount: Math.max(
                                    1, Math.floor(
                                        (mainScheduleView.width + mainScheduleView.spacing)
-                                       / (250 + mainScheduleView.spacing)))
+                                       / (Theme.columnWidthDayBoard + mainScheduleView.spacing)))
     // Горизонтальный список дней
     ListView {
         id: mainScheduleView

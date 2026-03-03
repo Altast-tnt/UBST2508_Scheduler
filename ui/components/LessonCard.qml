@@ -25,10 +25,10 @@ import QtQuick.Layouts
 */
 Rectangle {
     id: lessonCard
-    radius: 10
+    radius: Theme.cardsRadius
     // Эффект выделения при наведении курсора
     color: (cardMouseArea.containsMouse) ? Theme.background : Theme.surface
-    implicitWidth: 260
+    implicitWidth: Theme.cardsWidth
     implicitHeight: layoutTexts.implicitHeight + 32
 
     /*! \qmlproperty string LessonCard::sName Полное название учебной дисциплины. */

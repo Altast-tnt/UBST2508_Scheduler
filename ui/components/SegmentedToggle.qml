@@ -21,7 +21,7 @@ import QtQuick.Layouts
 */
 Rectangle {
     id: segmentedToggle
-    radius: 40
+    radius: Theme.segmentedToggleRadius
     color: "transparent"
 
 
@@ -40,7 +40,7 @@ Rectangle {
     property string secondText
 
     // Автоматический расчет размеров на основе текста, если не заданы явно
-    implicitWidth: 340
+    implicitWidth: Theme.segmentedToggleWidth
     implicitHeight: textLessons.implicitHeight + 15
 
     RowLayout {
@@ -53,7 +53,7 @@ Rectangle {
             id: buttonLessons
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: 40
+            radius: Theme.segmentedToggleRadius
 
             // Визуальное выделение активного состояния
             color: (segmentedToggle.currentIndex === 0) ? Theme.accentBlue : "transparent"
@@ -86,7 +86,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: (segmentedToggle.currentIndex === 1) ? Theme.accentBlue : "transparent"
-            radius: 40
+            radius: Theme.segmentedToggleRadius
             Text {
                 id: textDeadlines
 

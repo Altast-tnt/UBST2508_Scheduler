@@ -103,7 +103,7 @@ BasePopup {
         delegate: FileCard {
 
             width: popupList.width
-            height: 60
+            height: Theme.fileCardHeight
 
             imageSource: fileIcon
             fName: fileName

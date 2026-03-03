@@ -47,14 +47,14 @@ BasePopup {
         /*! \internal Делегат заголовка секции (плашка с датой) */
         section.delegate: Rectangle {
             width: listView.width
-            height: 40
+            height: Theme.delegateDateRectHeight
             color: "transparent"
 
             Rectangle {
                 anchors.centerIn: parent
                 width: dateText.implicitWidth + 30
-                height: 30
-                radius: 20
+                height: Theme.dateRectHeight
+                radius: Theme.dateBubbleRadius
                 color: Theme.surface
                 border.color: Theme.accentBlue
 

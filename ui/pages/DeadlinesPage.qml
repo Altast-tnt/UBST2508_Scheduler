@@ -37,7 +37,7 @@ ColumnLayout {
 
         firstText: "Список"
         secondText: "Календарь"
-        implicitWidth: 230
+        implicitWidth: Theme.segmentedToggleWidthSmall
     }
 
     // --- Контейнер представлений ---

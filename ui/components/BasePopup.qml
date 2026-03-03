@@ -54,7 +54,7 @@ Popup {
 
     background: Rectangle {
         color: Theme.background
-        radius: 30
+        radius: Theme.popupRadius
         border.color: Theme.textPrimary
         border.width: 1
     }

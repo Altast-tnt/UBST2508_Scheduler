@@ -20,7 +20,7 @@ import QtQuick.Controls
 */
 Rectangle {
     id: rootFileCard
-    implicitHeight: 60
+    implicitHeight: Theme.fileCardHeight
     color: Theme.surface
     radius: 5
 
@@ -53,8 +53,8 @@ Rectangle {
                TODO: Рассмотреть использование Screen.devicePixelRatio
                или адаптивных единиц для размеров иконок.
             */
-            Layout.preferredWidth: 40
-            Layout.preferredHeight: 40
+            Layout.preferredWidth: Theme.fileIconSize
+            Layout.preferredHeight: Theme.fileIconSize
             verticalAlignment: Qt.AlignVCenter
         }
 
@@ -89,8 +89,8 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter
             icon.source: "../../assets/icons/download.svg"
             icon.color: Theme.textPrimary
-            icon.width: 24
-            icon.height: 24
+            icon.width: Theme.downloadBtnSize
+            icon.height: Theme.downloadBtnSize
 
             // Прозрачный фон для кнопки
             background: Item {}

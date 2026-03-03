@@ -98,8 +98,8 @@ BasePopup {
 
             /*! \internal Кастомный стиль индикатора CheckBox */
             indicator: Rectangle {
-                implicitWidth: 20
-                implicitHeight: 20
+                implicitWidth: Theme.checkBoxSize
+                implicitHeight: Theme.checkBoxSize
                 radius: 4
                 color: control.checked ? Theme.accentBlue : Theme.surface
                 border.color: Theme.textPrimary
@@ -175,7 +175,7 @@ BasePopup {
         delegate: FileCard {
 
             width: popupList.width
-            height: 60
+            height: Theme.fileCardHeight
 
             // Роли модели: fileIcon, fileName, filePath
             imageSource: fileIcon

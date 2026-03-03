@@ -25,10 +25,10 @@ import QtQuick.Layouts
 */
 Rectangle {
     id: deadlineCard
-    radius: 10
+    radius: Theme.cardsRadius
     // Интерактивная смена фона при наведении
     color: (cardMouseArea.containsMouse) ? Theme.background : Theme.surface
-    implicitWidth: 260
+    implicitWidth: Theme.cardsWidth
     implicitHeight: layoutTexts.implicitHeight + 32
 
     /*! \qmlproperty string DeadlineCard::sName Название учебного предмета. */
