@@ -24,6 +24,8 @@ ScheduleListModel *Day::dailyModel() const
     return m_dailyModel;
 }
 
+
+
 void Day::setDailyModel(ScheduleListModel *newDailyModel)
 {
     if (m_dailyModel == newDailyModel)

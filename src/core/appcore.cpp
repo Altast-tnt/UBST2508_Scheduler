@@ -2,12 +2,20 @@
 #include "src/entities/day.h"
 #include "src/entities/commonTypes.h"
 
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
+
 Appcore::Appcore(QObject *parent)
     : QObject{parent}
 {
     m_dayListModel = new DayListModel(this);
     m_fileModel = new FileListModel(this);
     m_subjectDeadlinesModel = new DeadlineListModel(this);
+    m_networkManager = new QNetworkAccessManager(this);
 }
 
 void Appcore::loadTestData()
@@ -158,6 +166,20 @@ void Appcore::loadTestData()
     setCurrentSubject(math);
 }
 
+void Appcore::loadFromGoogleSheets()
+{
+    QNetworkRequest request(QUrl("https://script.google.com/macros/s/AKfycbwwO9mYGbUwU23IKdULjzhoP8p9aitswx0oofqHTzYClhhmgJFb5M3i3ZW6RP0cF8nu/exec"));
+    QNetworkReply* reply = m_networkManager->get(request);
+
+    connect(reply, &QNetworkReply::finished, this, [=]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray response = reply->readAll();
+            parseAndApplyJson(response);
+        }
+        reply->deleteLater();
+    });
+}
+
 Subject *Appcore::currentSubject() const
 {
     return m_currentSubject;
@@ -276,6 +298,35 @@ void Appcore::setDayListModel(DayListModel *newDayListModel)
 DeadlineListModel *Appcore::subjectDeadlinesModel() const
 {
      return m_subjectDeadlinesModel;
+}
+
+void Appcore::parseAndApplyJson(const QByteArray &data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || !doc.isArray()) return;
+
+    QJsonArray rootArray = doc.array();
+
+    for (const QJsonValue &value : rootArray) {
+        QJsonObject obj = value.toObject();
+
+        // Получаем данные из JSON
+        QString dateStr = obj["date"].toString();
+        QString subjectName = obj["subject"].toString();
+        // ...
+
+        // Ищем или создаем сущности
+        //Subject* subj = findOrCreateSubject(subjectName);
+        //Day* day = findOrCreateDay(QDate::fromString(dateStr, "dd.MM.yyyy"));
+
+        // Создаем урок
+        //Lesson* lesson = new Lesson(day);
+        //lesson->setSubject(subj);
+        // ...
+
+        // Передаем в модель дня (нужно передать список уроков на день)
+        // day->dailyModel()->addLesson(lesson);
+    }
 }
 
 

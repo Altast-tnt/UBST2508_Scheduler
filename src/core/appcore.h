@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QList>
+#include <QNetworkAccessManager>
+
 #include "src/entities/deadline.h"
 #include "src/entities/subject.h"
 
@@ -63,6 +65,8 @@ public:
      * - DeadlineListModel
      */
     Q_INVOKABLE void loadTestData();
+
+    void loadFromGoogleSheets();
 
     /**
      * @brief Возвращает текущий предмет, установленный в Appcore (m_currentSubject)
@@ -174,6 +178,9 @@ private:
     FileListModel *m_fileModel = nullptr;
     DayListModel *m_dayListModel = nullptr;
     DeadlineListModel *m_subjectDeadlinesModel = nullptr;
+    QNetworkAccessManager *m_networkManager;
+
+    void parseAndApplyJson(const QByteArray &data);
 };
 
 #endif // APPCORE_H
