@@ -204,11 +204,25 @@ public:
      */
     void setUrl(const QString &newUrl);
 
+    /**
+     * @brief Возвращает название предмета, к которому относится файл, установленный в m_subjectName
+     * @return QString
+     */
+    QString subjectName() const;
+
+    /**
+     * @brief Устанавливает название предмета, к которому относится файл в m_subjectName
+     * @param newSubjectName, константная ссылка на строку с названием предмета
+     */
+    void setSubjectName(const QString &newSubjectName);
+
+
 private:
     QString m_name;
     QString m_path = "";
     FileType m_type = MAX_TYPES;
     QString m_url = "";
+    QString m_subjectName;
 
 signals:
     void nameChanged();
@@ -216,11 +230,25 @@ signals:
     void pathChanged();
     void typeChanged();
     void urlChanged();
+    void subjectNameChanged();
 };
 
 inline QString File::url() const
 {
     return m_url;
+}
+
+inline QString File::subjectName() const
+{
+    return m_subjectName;
+}
+
+inline void File::setSubjectName(const QString &newSubjectName)
+{
+    if (m_subjectName == newSubjectName)
+        return;
+    m_subjectName = newSubjectName;
+    emit subjectNameChanged();
 }
 
 inline File::FileType File::type() const

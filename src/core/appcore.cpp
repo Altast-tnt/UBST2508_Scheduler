@@ -360,20 +360,20 @@ void Appcore::downloadFile(File *file)
                 // Обновляем объект и сохраняем путь
                 file->setPath(savePath);
                 QSettings settings("MyUniversityApp", "Scheduler");
-                settings.setValue("file_path_" + file->url(), savePath);
+                settings.setValue("file_path_" + file->subjectName() + "_" + file->name(), savePath);
 
                 for (Subject* subj : std::as_const(m_subjects))
                 {
                     for (File* f : subj->files())
                     {
-                        if (f->name() == file->name())
+                        if (f->name() == file->name() && subj->name() == file->subjectName())
                         {
                             f->setPath(savePath);
                         }
                     }
                     for (Deadline* d : subj->deadlines()) {
                         for (File* f : d->files()) {
-                            if (f->name() == file->name())
+                            if (f->name() == file->name() && subj->name() == file->subjectName())
                             {
                                 f->setPath(savePath);
                             }
@@ -490,7 +490,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
             File *file = new File(fileName, fileUrl, "", fType,  subj);
 
-            QString savedPath = settings.value("file_path_" + fileUrl, "").toString();
+            QString savedPath = settings.value("file_path_" + file->subjectName() + "_" + file->name(), "").toString();
 
             if (!savedPath.isEmpty()) {
                 // Проверяем, что файл всё еще реально существует на диске
@@ -498,7 +498,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
                     file->setPath(savedPath);
                 } else {
                     // Если пользователь удалил файл руками — чистим настройку
-                    settings.remove("file_path_" + fileUrl);
+                    settings.remove("file_path_" + file->subjectName() + "_" + file->name());
                 }
             }
 
@@ -654,7 +654,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
             File *file = new File(fileName, fileUrl, "", fType, deadline);
 
-            QString savedPath = settings.value("file_path_" + file->name(), "").toString();
+            QString savedPath = settings.value("file_path_" + file->subjectName() + "_" + file->name(), "").toString();
 
             if (!savedPath.isEmpty()) {
                 // Проверяем, что файл всё еще реально существует на диске
@@ -662,7 +662,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
                     file->setPath(savedPath);
                 } else {
                     // Если пользователь удалил файл руками — чистим настройку
-                    settings.remove("file_path_" + file->name());
+                    settings.remove("file_path_" + file->subjectName() + "_" + file->name());
                 }
             }
 
