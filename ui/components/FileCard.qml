@@ -49,6 +49,7 @@ Rectangle {
         Image {
             source: rootFileCard.imageSource
 
+
             /*
                TODO: Рассмотреть использование Screen.devicePixelRatio
                или адаптивных единиц для размеров иконок.
@@ -87,7 +88,7 @@ Rectangle {
         // Кнопка скачивания
         RoundButton {
             Layout.alignment: Qt.AlignVCenter
-            icon.source: "../../assets/icons/download.svg"
+            icon.source: rootFileCard.fPath === "" ? "../../assets/icons/download.svg" : "../../assets/icons/openFile.svg"
             icon.color: Theme.textPrimary
             icon.width: Theme.downloadBtnSize
             icon.height: Theme.downloadBtnSize
@@ -99,12 +100,12 @@ Rectangle {
             hoverEnabled: true
 
             onClicked: {
-
-                /*
-                   TODO: Реализовать интеграцию с C++ менеджером закачек.
-                   На данный момент выводит лог в консоль.
-                */
-                console.log("Скачиваем файл: " + rootFileCard.fName)
+                if (rootFileCard.fPath === "") {
+                    appcore.downloadFile(fileObj)
+                } else {
+                    // Чтобы файл открылся в системной программе (Word, PDF Reader)
+                    Qt.openUrlExternally("file://" + rootFileCard.fPath)
+                }
             }
         }
     }

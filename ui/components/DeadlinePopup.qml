@@ -171,17 +171,19 @@ BasePopup {
         spacing: 10
 
         // Ожидается модель файлов из C++
-        model: appcore.fileModel
+        model: appcore.deadlineFileModel
 
         delegate: FileCard {
 
             width: popupList.width
             height: Theme.fileCardHeight
 
+            property var fileObj: model.fileObject
+
             // Роли модели: fileIcon, fileName, filePath
             imageSource: fileIcon
             fName: fileName
-            fPath: filePath
+            fPath: fileObj ? fileObj.path : ""
         }
         visible: count > 0
     }

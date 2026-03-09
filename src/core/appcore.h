@@ -43,7 +43,8 @@ class Appcore : public QObject
     Q_PROPERTY(DayListModel* dayListModel READ dayListModel WRITE setDayListModel NOTIFY dayListModelChanged FINAL)
     Q_PROPERTY(DayListModel* deadlinesDayListModel READ deadlinesDayListModel WRITE setDeadlinesDayListModel NOTIFY deadlinesDayListModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* deadlineModel READ deadlineModel WRITE setDeadlineModel NOTIFY deadlineModelChanged FINAL)
-    Q_PROPERTY(FileListModel* fileModel READ fileModel WRITE setFileModel NOTIFY fileModelChanged FINAL)
+    Q_PROPERTY(FileListModel* subjectFileModel READ subjectFileModel WRITE setSubjectFileModel NOTIFY subjectFileModelChanged FINAL)
+    Q_PROPERTY(FileListModel* deadlineFileModel READ deadlineFileModel WRITE setDeadlineFileModel NOTIFY deadlineFileModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* subjectDeadlinesModel READ subjectDeadlinesModel CONSTANT)
 
 public:
@@ -129,15 +130,26 @@ public:
     void setDeadlineModel(DeadlineListModel *newDeadlineModel);
 
     /**
-     * @brief Возвращает модель файлов, установленную в Appcore (m_fileModel)
+     * @brief Возвращает модель файлов, установленную в Appcore (m_subjectFileModel)
      * @return FileListModel*, указатель на объект модели файлов
      */
-    FileListModel *fileModel() const;
+    FileListModel *subjectFileModel() const;
     /**
-     * @brief Устанавливает новую модель файлов в m_fileModel
-     * @param newFileModel, указатель на объект модели файлов (FileListModel)
+     * @brief Устанавливает новую модель файлов в m_subjectFileModel
+     * @param newSubjectFileModel, указатель на объект модели файлов (FileListModel)
      */
-    void setFileModel(FileListModel *newFileModel);
+    void setSubjectFileModel(FileListModel *newSubjectFileModel);
+
+    /**
+     * @brief Возвращает модель файлов, установленную в Appcore (m_deadlineFileModel)
+     * @return FileListModel*, указатель на объект модели файлов
+     */
+    FileListModel *deadlineFileModel() const;
+    /**
+     * @brief Устанавливает новую модель файлов в m_deadlineFileModel
+     * @param newDeadlineFileModel, указатель на объект модели файлов (FileListModel)
+     */
+    void setDeadlineFileModel(FileListModel *newDeadlineFileModel);
 
     /**
      * @brief Возвращает модель дней, установленную в Appcore (m_dayListModel)
@@ -160,6 +172,10 @@ public:
     DayListModel *deadlinesDayListModel() const;
     void setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel);
     Q_INVOKABLE void saveDeadlineStatus(Deadline* deadline);
+    Q_INVOKABLE void downloadFile(File* file);
+    Q_INVOKABLE void refreshSubjectFiles();
+
+
 
 signals:
     void currentSubjectChanged();
@@ -171,25 +187,29 @@ signals:
 
     void deadlineModelChanged();
 
-    void fileModelChanged();
-
     void dayListModelChanged();
 
     void deadlinesDayListModelChanged();
+
+    void subjectFileModelChanged();
+
+    void deadlineFileModelChanged();
 
 private:
     Subject *m_currentSubject = nullptr;
     Deadline *m_currentDeadline = nullptr;
     QList<Subject *> m_subjects;
+    FileListModel *m_subjectFileModel = nullptr;
+    FileListModel *m_deadlineFileModel = nullptr;
     ScheduleListModel *m_scheduleModel = nullptr;
     DeadlineListModel *m_deadlineModel = nullptr;
-    FileListModel *m_fileModel = nullptr;
     DayListModel *m_dayListModel = nullptr;
     DayListModel *m_deadlinesDayListModel = nullptr;
     DeadlineListModel *m_subjectDeadlinesModel = nullptr;
     QNetworkAccessManager *m_networkManager;
 
     void parseAndApplyJson(const QByteArray &data);
+
 
 };
 

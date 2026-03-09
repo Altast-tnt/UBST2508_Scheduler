@@ -8,13 +8,16 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QFile>
+#include <QFileDialog>
 
 Appcore::Appcore(QObject *parent)
     : QObject{parent}
 {
     m_dayListModel = new DayListModel(this);
     m_deadlinesDayListModel = new DayListModel(this);
-    m_fileModel = new FileListModel(this);
+    m_subjectFileModel = new FileListModel(this);
+    m_deadlineFileModel = new FileListModel(this);
     m_subjectDeadlinesModel = new DeadlineListModel(this);
     m_networkManager = new QNetworkAccessManager(this);
 }
@@ -30,7 +33,7 @@ void Appcore::loadTestData()
     historyTeacher->setName("Лаврова Ирина Анатольевна");
     historyTeacher->setEmail("iralavrova@mail.com");
 
-    File* presHistory = new File("Лекция 1", "../../lect1.pptx", File::PPTX, this);
+    File* presHistory = new File("Лекция 1", "", "../../lect1.pptx", File::PPTX, this);
 
     Subject* history = new Subject(this);
     history->setName("История России");
@@ -96,7 +99,7 @@ void Appcore::loadTestData()
             deadlineListDay.append(d1);
 
 
-            File* labTask = new File("Задание на лабу", "../../lab1.pdf", File::PDF, this);
+            File* labTask = new File("Задание на лабу", "", "../../lab1.pdf", File::PDF, this);
 
             Deadline* d2 = new Deadline(day);
             d2->setSubject(history);
@@ -112,7 +115,7 @@ void Appcore::loadTestData()
             history->addDeadline(d2);
             deadlineListDay.append(d2);
 
-            File* labTask2 = new File("Задание на лабу222", "../../lab2.pdf", File::PDF, this);
+            File* labTask2 = new File("Задание на лабу222", "", "../../lab2.pdf", File::PDF, this);
 
             Deadline* d4 = new Deadline(day);
             d4->setSubject(history);
@@ -194,15 +197,15 @@ void Appcore::setCurrentSubject(Subject *newCurrentSubject)
     m_currentSubject = newCurrentSubject;
 
     if (m_currentSubject) {
-        if (m_fileModel) {
-            m_fileModel->setFiles(m_currentSubject->files());
+        if (m_subjectFileModel) {
+            m_subjectFileModel->setFiles(m_currentSubject->files());
         }
 
         if (m_subjectDeadlinesModel) {
             m_subjectDeadlinesModel->setDeadlines(m_currentSubject->deadlines());
         }
     } else {
-        if (m_fileModel) m_fileModel->setFiles({});
+        if (m_subjectFileModel) m_subjectFileModel->setFiles({});
         if (m_subjectDeadlinesModel) m_subjectDeadlinesModel->setDeadlines({});
     }
 
@@ -224,8 +227,8 @@ void Appcore::setCurrentDeadline(Deadline *newCurrentDeadline)
         m_currentSubject = m_currentDeadline->subject();
         emit currentSubjectChanged();
 
-        if (m_fileModel) {
-            m_fileModel->setFiles(m_currentDeadline->files());
+        if (m_deadlineFileModel) {
+            m_deadlineFileModel->setFiles(m_currentDeadline->files());
         }
     }
     emit currentDeadlineChanged();
@@ -270,17 +273,30 @@ void Appcore::setDeadlineModel(DeadlineListModel *newDeadlineModel)
     emit deadlineModelChanged();
 }
 
-FileListModel *Appcore::fileModel() const
+FileListModel *Appcore::subjectFileModel() const
 {
-    return m_fileModel;
+    return m_subjectFileModel;
 }
 
-void Appcore::setFileModel(FileListModel *newFileModel)
+void Appcore::setSubjectFileModel(FileListModel *newSubjectFileModel)
 {
-    if (m_fileModel == newFileModel)
+    if (m_subjectFileModel == newSubjectFileModel)
         return;
-    m_fileModel = newFileModel;
-    emit fileModelChanged();
+    m_subjectFileModel = newSubjectFileModel;
+    emit subjectFileModelChanged();
+}
+
+FileListModel *Appcore::deadlineFileModel() const
+{
+    return m_deadlineFileModel;
+}
+
+void Appcore::setDeadlineFileModel(FileListModel *newDeadlineFileModel)
+{
+    if (m_deadlineFileModel == newDeadlineFileModel)
+        return;
+    m_deadlineFileModel = newDeadlineFileModel;
+    emit deadlineFileModelChanged();
 }
 
 DayListModel *Appcore::dayListModel() const
@@ -316,6 +332,68 @@ void Appcore::saveDeadlineStatus(Deadline *deadline)
     settings.setValue(key, deadline->isCompleted());
 }
 
+void Appcore::downloadFile(File *file)
+{
+    qDebug() << "Попытка скачать файл...";
+    if (!file) {
+        qWarning() << "ОШИБКА: Объект File пуст!";
+        return;
+    }
+    qDebug() << "Имя файла:" << file->name();
+    qDebug() << "URL:" << file->url();
+
+    QString savePath = QFileDialog::getSaveFileName(nullptr, "Сохранить файл", file->name());
+    if (savePath == "") return;
+
+    QNetworkRequest request(QUrl(file->url()));
+    QNetworkReply* reply = m_networkManager->get(request);
+
+    connect(reply, &QNetworkReply::finished, this, [this, file, savePath, reply]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray response = reply->readAll();
+
+            QFile f(savePath);
+            if (f.open(QIODevice::WriteOnly)) {
+                f.write(response);
+                f.close();
+
+                // Обновляем объект и сохраняем путь
+                file->setPath(savePath);
+                QSettings settings("MyUniversityApp", "Scheduler");
+                settings.setValue("file_path_" + file->url(), savePath);
+
+                for (Subject* subj : std::as_const(m_subjects))
+                {
+                    for (File* f : subj->files())
+                    {
+                        if (f->name() == file->name())
+                        {
+                            f->setPath(savePath);
+                        }
+                    }
+                    for (Deadline* d : subj->deadlines()) {
+                        for (File* f : d->files()) {
+                            if (f->name() == file->name())
+                            {
+                                f->setPath(savePath);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            qWarning() << "Ошибка загрузки:" << reply->errorString();
+        }
+        reply->deleteLater();
+    });
+}
+
+void Appcore::refreshSubjectFiles()
+{
+    if (m_currentSubject && m_subjectFileModel) {
+        m_subjectFileModel->setFiles(m_currentSubject->files());
+    }
+}
 
 
 DeadlineListModel *Appcore::subjectDeadlinesModel() const
@@ -334,6 +412,8 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
 
     QJsonObject rootObj = doc.object();
 
+    QSettings settings("MyUniversityApp", "Scheduler");
+
     setCurrentSubject(nullptr);
     setCurrentDeadline(nullptr);
 
@@ -346,6 +426,10 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
     QJsonArray subjectsArray = rootObj["subjects"].toArray();
     QJsonArray scheduleArray = rootObj["schedule"].toArray();
     QJsonArray deadlinesArray = rootObj["deadlines"].toArray();
+
+    QJsonObject allFilesMap = rootObj["driveFiles"].toObject();
+
+
 
 
     for (const QJsonValue &value : std::as_const(subjectsArray))
@@ -383,6 +467,43 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         subj->addTeacher(teach);
         subj->setName(subjectName);
         subj->setType(sType);
+
+
+        QJsonObject subjectFilesInfo = allFilesMap[subjectName].toObject();
+        QJsonArray commonFiles = subjectFilesInfo["common"].toArray();
+
+        for (const QJsonValue &fileVal : std::as_const(commonFiles)) {
+            QJsonObject fileObj = fileVal.toObject(); // Превращаем значение в объект
+
+            QString fileName = fileObj["name"].toString();
+            QString fileUrl  = fileObj["url"].toString();
+            QString typeStr  = fileObj["type"].toString().toUpper();
+
+            // 1. Превращаем строку "PDF" в твой Enum FileType
+            File::FileType fType = File::MAX_TYPES;
+            if (typeStr == "PDF") fType = File::PDF;
+            else if (typeStr == "XLSX" || typeStr == "XLS") fType = File::XLSX;
+            else if (typeStr == "PPTX" || typeStr == "PPT") fType = File::PPTX;
+            else if (typeStr == "DOCX" || typeStr == "DOC") fType = File::DOCX;
+
+            // 2. Создаем объект файла
+            // Путь (path) пока оставляем пустым, так как файл еще не на диске
+            File *file = new File(fileName, fileUrl, "", fType,  subj);
+
+            QString savedPath = settings.value("file_path_" + fileUrl, "").toString();
+
+            if (!savedPath.isEmpty()) {
+                // Проверяем, что файл всё еще реально существует на диске
+                if (QFile::exists(savedPath)) {
+                    file->setPath(savedPath);
+                } else {
+                    // Если пользователь удалил файл руками — чистим настройку
+                    settings.remove("file_path_" + fileUrl);
+                }
+            }
+
+            subj->addFile(file);
+        }
 
         // Добавляем в общий список AppCore
         m_subjects.append(subj);
@@ -467,6 +588,8 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         QString descStr     = row[4].toString();
 
 
+        QJsonObject subjectFilesInfo = allFilesMap[subjectName].toObject();
+
         QDate dDate = QDate::fromString(dateStr, "dd.MM.yyyy");
         if (!dDate.isValid()) dDate = QDate::fromString(dateStr, "d.M.yyyy");
         if (!dDate.isValid()) dDate = QDate::fromString(dateStr, "d.M.yy");
@@ -505,9 +628,46 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         deadline->setDescription(descStr);
         deadline->setIsCompleted(false);
 
-        QSettings settings("MyUniversityApp", "Scheduler");
+
         QString key = "deadline_" + deadline->dateTime().toString() + "_" + deadline->description();
         deadline->setIsCompleted(settings.value(key, false).toBool());
+
+
+        QString folderKey = deadline->dateTime().toString("HH:mm dd.MM.yy");
+        QJsonArray deadlineFiles = subjectFilesInfo["deadlines"].toObject()[folderKey].toArray();
+
+        for (const QJsonValue &fileVal : std::as_const(deadlineFiles)) {
+            QJsonObject fileObj = fileVal.toObject(); // Превращаем значение в объект
+
+            QString fileName = fileObj["name"].toString();
+            QString fileUrl  = fileObj["url"].toString();
+            QString typeStr  = fileObj["type"].toString().toUpper();
+
+            // 1. Превращаем строку "PDF" в твой Enum FileType
+            File::FileType fType = File::MAX_TYPES;
+            if (typeStr == "PDF") fType = File::PDF;
+            else if (typeStr == "XLSX" || typeStr == "XLS") fType = File::XLSX;
+            else if (typeStr == "PPTX" || typeStr == "PPT") fType = File::PPTX;
+            else if (typeStr == "DOCX" || typeStr == "DOC") fType = File::DOCX;
+
+            // 2. Создаем объект файла
+            // Путь (path) пока оставляем пустым, так как файл еще не на диске
+            File *file = new File(fileName, fileUrl, "", fType, deadline);
+
+            QString savedPath = settings.value("file_path_" + file->name(), "").toString();
+
+            if (!savedPath.isEmpty()) {
+                // Проверяем, что файл всё еще реально существует на диске
+                if (QFile::exists(savedPath)) {
+                    file->setPath(savedPath);
+                } else {
+                    // Если пользователь удалил файл руками — чистим настройку
+                    settings.remove("file_path_" + file->name());
+                }
+            }
+
+            deadline->addFile(file);
+        }
 
 
         foundSubject->addDeadline(deadline);
@@ -559,6 +719,8 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         m_deadlinesDayListModel->addDay(deadlineDay);
     }
 }
+
+
 
 
 

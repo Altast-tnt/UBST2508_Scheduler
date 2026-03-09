@@ -89,6 +89,9 @@ Rectangle {
             // Сообщаем ядру приложения, какой предмет сейчас выбран
             appcore.currentSubject = model.subjectObject
 
+            // Принудительно обновляем список файлов именно для предмета
+            appcore.refreshSubjectFiles()
+
             // Открываем окно с деталями (преподаватели, почта и т.д.)
             globalSubjectPopup.open()
         }

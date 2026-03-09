@@ -4,7 +4,7 @@ project(UBST2508_Sheduler VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Quick)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -20,14 +20,19 @@ qt_add_qml_module(appUBST2508_Sheduler
     QML_FILES
         Main.qml
         ui/theme/Theme.qml
+        ui/pages/SchedulePage.qml
+        ui/pages/DeadlinesPage.qml
         ui/components/LessonCard.qml
         ui/components/SegmentedToggle.qml
         ui/components/DayBoard.qml
         ui/components/DeadlineCard.qml
         ui/components/CalendarView.qml
         ui/components/NavigationButton.qml
-        ui/pages/SchedulePage.qml
-        ui/pages/DeadlinesPage.qml
+        ui/components/SubjectPopup.qml
+        ui/components/FileCard.qml
+        ui/components/DeadlinePopup.qml
+        ui/components/SubjectDeadlinesPopup.qml
+        ui/components/BasePopup.qml
     RESOURCES
         "assets/fonts/Inter_24pt-Medium.ttf"
         "assets/icons/pdf.svg"
@@ -40,23 +45,20 @@ qt_add_qml_module(appUBST2508_Sheduler
         "assets/icons/back.svg"
         "assets/icons/arrow.svg"
         "assets/icons/download.svg"
+        "assets/icons/openFile.svg"
         "assets/images/noDeadline.gif"
     SOURCES
+        src/core/appcore.h src/core/appcore.cpp
         src/entities/commonTypes.h
         src/entities/subject.h src/entities/subject.cpp
         src/entities/deadline.h src/entities/deadline.cpp
         src/entities/lesson.h src/entities/lesson.cpp
-        src/core/appcore.h src/core/appcore.cpp
+        src/entities/day.h src/entities/day.cpp
         src/models/schedulelistmodel.h src/models/schedulelistmodel.cpp
         src/models/daylistmodel.h src/models/daylistmodel.cpp
-        src/entities/day.h src/entities/day.cpp
         src/models/deadlinelistmodel.h src/models/deadlinelistmodel.cpp
-        QML_FILES ui/components/SubjectPopup.qml
-        QML_FILES ui/components/FileCard.qml
-        SOURCES src/models/filelistmodel.h src/models/filelistmodel.cpp
-        QML_FILES ui/components/DeadlinePopup.qml
-        QML_FILES ui/components/SubjectDeadlinesPopup.qml
-        QML_FILES ui/components/BasePopup.qml
+        src/models/filelistmodel.h src/models/filelistmodel.cpp
+
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -72,6 +74,7 @@ set_target_properties(appUBST2508_Sheduler PROPERTIES
 
 target_link_libraries(appUBST2508_Sheduler
     PRIVATE Qt6::Quick
+    Qt6::Widgets
 )
 
 include(GNUInstallDirs)

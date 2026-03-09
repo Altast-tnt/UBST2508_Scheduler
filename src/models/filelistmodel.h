@@ -23,7 +23,8 @@ public:
     {
         FileNameRole = Qt::UserRole + 1,
         FilePathRole,
-        FileIconRole
+        FileIconRole,
+        FileObjectRole
     };
 
     /**

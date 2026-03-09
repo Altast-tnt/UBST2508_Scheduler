@@ -28,6 +28,8 @@ QVariant FileListModel::data(const QModelIndex &index, int role) const
         return file->path();
     case FileIconRole:
         return file->icon();
+    case FileObjectRole:
+        return QVariant::fromValue(file);
     default:
         return QVariant();
     }
@@ -39,6 +41,7 @@ QHash<int, QByteArray> FileListModel::roleNames() const
     roles[FileNameRole] = "fileName";
     roles[FilePathRole] = "filePath";
     roles[FileIconRole] = "fileIcon";
+    roles[FileObjectRole] = "fileObject";
     return roles;
 }
 

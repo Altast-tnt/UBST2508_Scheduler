@@ -109,7 +109,7 @@ void Deadline::addFile(File *file)
     if (!file) return;
     for (auto f : std::as_const(m_files))
     {
-        if (f->path() == file->path())
+        if (f->url() == file->url())
         {
             return;
         }

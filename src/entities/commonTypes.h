@@ -125,18 +125,25 @@ public:
      * - m_path
      * - m_type
      * @param name, наименование файла (без типа файла)
+     * @param url, ссылка на скачивание файла
      * @param path, полный путь файла после скачивания
      * @param type, тип файла из перечисления FileType
      * @param parent, указатель на родительский объект QObject
      */
-    File(QString name, QString path, FileType type, QObject *parent = nullptr)
-        : QObject(parent), m_name(name), m_path(path), m_type(type)
+    File(QString name, QString url, QString path, FileType type, QObject *parent = nullptr)
+        : QObject(parent), m_name(name), m_url(url), m_path(path), m_type(type)
     {}
 
     /**
      * @brief Наименование файла
      */
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
+
+    /**
+     * @brief Ссылка на скачивание файла
+     */
+    Q_PROPERTY(QString url READ url NOTIFY urlChanged FINAL)
+
     /**
      * @brief Путь к иконке (определяется программно)
      */
@@ -185,17 +192,36 @@ public:
      */
     FileType type() const;
 
+    /**
+     * @brief Возвращает ссылку на скачивание файла, установленный в m_url
+     * @return QString
+     */
+    QString url() const;
+
+    /**
+     * @brief Устанавливает ссылку на скачивание файла в m_url
+     * @param newUrl, константная ссылка на строку с ссылкой скачивания файла
+     */
+    void setUrl(const QString &newUrl);
+
 private:
     QString m_name;
     QString m_path = "";
     FileType m_type = MAX_TYPES;
+    QString m_url = "";
 
 signals:
     void nameChanged();
     void iconChanged();
     void pathChanged();
     void typeChanged();
+    void urlChanged();
 };
+
+inline QString File::url() const
+{
+    return m_url;
+}
 
 inline File::FileType File::type() const
 {

@@ -98,16 +98,19 @@ BasePopup {
         clip: true
         spacing: 10
 
-        model: appcore.fileModel
+        model: appcore.subjectFileModel
 
         delegate: FileCard {
 
             width: popupList.width
             height: Theme.fileCardHeight
 
+            property var fileObj: model.fileObject
+
             imageSource: fileIcon
             fName: fileName
-            fPath: filePath
+
+            fPath: fileObj ? fileObj.path : ""
         }
         visible: count > 0
     }
