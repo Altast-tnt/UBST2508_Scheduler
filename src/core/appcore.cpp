@@ -316,7 +316,8 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
     QJsonArray deadlinesArray = rootObj["deadlines"].toArray();
 
 
-    for (const QJsonValue &value : subjectsArray) {
+    for (const QJsonValue &value : std::as_const(subjectsArray))
+    {
 
         QJsonArray row = value.toArray();
 
@@ -329,11 +330,14 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         Subject::SubjectType sType = Subject::MAX_TYPES;
         examTypeStr = examTypeStr.trimmed().toUpper();
 
-        if (examTypeStr == "EXAM") {
+        if (examTypeStr == "EXAM")
+        {
             sType = Subject::EXAM;
-        } else if (examTypeStr == "CREDIT") {
+        } else if (examTypeStr == "CREDIT")
+        {
             sType = Subject::CREDIT;
-        } else if (examTypeStr == "CREDITWITHGRADE") {
+        } else if (examTypeStr == "CREDITWITHGRADE")
+        {
             sType = Subject::CREDITWITHGRADE;
         }
 
@@ -352,6 +356,98 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         m_subjects.append(subj);
     }
     qDebug() << "Предметов загружено:" << m_subjects.count();
+
+    QMap<QDate, QList<Lesson*>> daysMap;
+
+    for (const QJsonValue &value : std::as_const(scheduleArray))
+    {
+        QJsonArray row = value.toArray();
+
+        QString dateStr = row[0].toString();
+        QString startTimeStr = row[1].toString();
+        QString endTimeStr = row[2].toString();
+        QString subjectName = row[3].toString();
+        QString lessonTypeStr = row[4].toString();
+
+        QDate lessonDate = QDate::fromString(dateStr, "dd.MM.yyyy");
+        if (!lessonDate.isValid()) lessonDate = QDate::fromString(dateStr, "d.M.yyyy");
+        if (!lessonDate.isValid()) lessonDate = QDate::fromString(dateStr, "d.M.yy"); // Для 22.4.26
+
+        // Защита: если дата всё равно сломана, просто выкидываем этот урок!
+        if (!lessonDate.isValid()) {
+            qWarning() << "ПРОПУСК: Кривая дата в таблице:" << dateStr;
+            continue;
+        }
+
+        // H - часы без обязательного нуля (9 или 09), m - минуты (30), s - секунды
+        QTime startTime = QTime::fromString(startTimeStr, "H:m:s");
+        if (!startTime.isValid()) startTime = QTime::fromString(startTimeStr, "H:m"); // Если секунд нет
+
+        QTime endTime = QTime::fromString(endTimeStr, "H:m:s");
+        if (!endTime.isValid()) endTime = QTime::fromString(endTimeStr, "H:m");
+
+        // Защита: если время сломано, выводим в лог, но можем оставить (QML просто не покажет его)
+        if (!startTime.isValid()) {
+            qWarning() << "Кривое время старта:" << startTimeStr << "у предмета" << subjectName;
+        }
+
+        Subject *foundSubject = nullptr;
+        for (Subject *s : std::as_const(m_subjects)) {
+            if (s->name() == subjectName) {
+                foundSubject = s;
+                break;
+            }
+        }
+
+        if (!foundSubject) {
+            qWarning() << "Предмет не найден:" << subjectName;
+            continue;
+        }
+
+        Lesson::LessonType lType = Lesson::MAX_TYPES;
+        lessonTypeStr = lessonTypeStr.trimmed().toUpper();
+        if (lessonTypeStr == "LECTION") lType = Lesson::LECTION;
+        else if (lessonTypeStr == "PRAKTIK") lType = Lesson::PRAKTIK;
+        else if (lessonTypeStr == "LAB") lType = Lesson::LAB;
+        else if (lessonTypeStr == "KONTROL") lType = Lesson::KONTROL;
+        else if (lessonTypeStr == "EXAM") lType = Lesson::EXAM;
+        else if (lessonTypeStr == "RETAKE") lType = Lesson::RETAKE;
+
+        Lesson *lesson = new Lesson(this);
+        lesson->setSubject(foundSubject);
+        lesson->setType(lType);
+        lesson->setStartTime(startTime);
+        lesson->setEndTime(endTime);
+        lesson->setDate(lessonDate);
+
+        daysMap[lessonDate].append(lesson);
+
+    }
+
+    for (auto it = daysMap.begin(); it != daysMap.end(); ++it) {
+
+        // Создаем День
+        Day* day = new Day(this);
+        day->setDate(it.key());
+
+        // Создаем Модель уроков для этого дня
+        ScheduleListModel* modelDay = new ScheduleListModel(day);
+
+        // Отдаем модели готовый список уроков из коробки
+        modelDay->setLessons(it.value());
+
+        // Прикрепляем модель к Дню
+        day->setDailyModel(modelDay);
+
+        // Добавляем готовый День в главную модель интерфейса!
+        m_dayListModel->addDay(day);
+    }
+
+    if (!m_subjects.isEmpty()) {
+        setCurrentSubject(m_subjects.first());
+    }
+
+    qDebug() << "Загрузка завершена! Дней создано:" << daysMap.keys().count();
 }
 
 
