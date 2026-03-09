@@ -309,6 +309,13 @@ void Appcore::setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel)
     emit deadlinesDayListModelChanged();
 }
 
+void Appcore::saveDeadlineStatus(Deadline *deadline)
+{
+    QSettings settings("MyUniversityApp", "Scheduler");
+    QString key = "deadline_" + deadline->dateTime().toString() + "_" + deadline->description();
+    settings.setValue(key, deadline->isCompleted());
+}
+
 
 
 DeadlineListModel *Appcore::subjectDeadlinesModel() const
@@ -497,6 +504,11 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         deadline->setDateTime(QDateTime(dDate, dTime));
         deadline->setDescription(descStr);
         deadline->setIsCompleted(false);
+
+        QSettings settings("MyUniversityApp", "Scheduler");
+        QString key = "deadline_" + deadline->dateTime().toString() + "_" + deadline->description();
+        deadline->setIsCompleted(settings.value(key, false).toBool());
+
 
         foundSubject->addDeadline(deadline);
         deadlinesMap[dDate].append(deadline);

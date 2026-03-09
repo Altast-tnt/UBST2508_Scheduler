@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QNetworkAccessManager>
+#include <QSettings>
 
 #include "src/entities/deadline.h"
 #include "src/entities/subject.h"
@@ -158,6 +159,7 @@ public:
 
     DayListModel *deadlinesDayListModel() const;
     void setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel);
+    Q_INVOKABLE void saveDeadlineStatus(Deadline* deadline);
 
 signals:
     void currentSubjectChanged();

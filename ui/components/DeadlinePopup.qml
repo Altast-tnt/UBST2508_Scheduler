@@ -92,6 +92,7 @@ BasePopup {
             onToggled: {
                 if (appcore.currentDeadline) {
                     appcore.currentDeadline.isCompleted = checked
+                    appcore.saveDeadlineStatus(appcore.currentDeadline)
                 }
             }
             text: ""
