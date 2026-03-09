@@ -303,30 +303,55 @@ DeadlineListModel *Appcore::subjectDeadlinesModel() const
 void Appcore::parseAndApplyJson(const QByteArray &data)
 {
     QJsonDocument doc = QJsonDocument::fromJson(data);
-    if (doc.isNull() || !doc.isArray()) return;
 
-    QJsonArray rootArray = doc.array();
+    if (doc.isNull() || !doc.isObject()) {
+        qWarning() << "Ошибка: JSON не является объектом!";
+        return;
+    }
 
-    for (const QJsonValue &value : rootArray) {
-        QJsonObject obj = value.toObject();
+    QJsonObject rootObj = doc.object();
+
+    QJsonArray subjectsArray = rootObj["subjects"].toArray();
+    QJsonArray scheduleArray = rootObj["schedule"].toArray();
+    QJsonArray deadlinesArray = rootObj["deadlines"].toArray();
+
+
+    for (const QJsonValue &value : subjectsArray) {
+
+        QJsonArray row = value.toArray();
 
         // Получаем данные из JSON
-        QString dateStr = obj["date"].toString();
-        QString subjectName = obj["subject"].toString();
-        // ...
+        QString subjectName = row[0].toString();
+        QString teacherName = row[1].toString();
+        QString teacherEmail = row[2].toString();
+        QString examTypeStr = row[3].toString();
 
-        // Ищем или создаем сущности
-        //Subject* subj = findOrCreateSubject(subjectName);
-        //Day* day = findOrCreateDay(QDate::fromString(dateStr, "dd.MM.yyyy"));
+        Subject::SubjectType sType = Subject::MAX_TYPES;
+        examTypeStr = examTypeStr.trimmed().toUpper();
 
-        // Создаем урок
-        //Lesson* lesson = new Lesson(day);
-        //lesson->setSubject(subj);
-        // ...
+        if (examTypeStr == "EXAM") {
+            sType = Subject::EXAM;
+        } else if (examTypeStr == "CREDIT") {
+            sType = Subject::CREDIT;
+        } else if (examTypeStr == "CREDITWITHGRADE") {
+            sType = Subject::CREDITWITHGRADE;
+        }
 
-        // Передаем в модель дня (нужно передать список уроков на день)
-        // day->dailyModel()->addLesson(lesson);
+        // Создаем учителя
+        Teacher *teach = new Teacher(this);
+        teach->setName(teacherName);
+        teach->setEmail(teacherEmail);
+
+        // Создаем предмет
+        Subject *subj = new Subject(this);
+        subj->addTeacher(teach);
+        subj->setName(subjectName);
+        subj->setType(sType);
+
+        // Добавляем в общий список AppCore
+        m_subjects.append(subj);
     }
+    qDebug() << "Предметов загружено:" << m_subjects.count();
 }
 
 

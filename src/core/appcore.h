@@ -66,7 +66,7 @@ public:
      */
     Q_INVOKABLE void loadTestData();
 
-    void loadFromGoogleSheets();
+    Q_INVOKABLE void loadFromGoogleSheets();
 
     /**
      * @brief Возвращает текущий предмет, установленный в Appcore (m_currentSubject)

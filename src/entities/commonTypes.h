@@ -24,6 +24,14 @@ class Teacher : public QObject
 
 public:
     /**
+     * @brief Конструктор класса
+     * @param parent указатель на родительский объект QObject
+     */
+    Teacher(QObject *parent = nullptr)
+        : QObject(parent)
+    {}
+
+    /**
      * @brief Возвращает ФИО преподавателя, установленное в m_name
      * @return QString
      */

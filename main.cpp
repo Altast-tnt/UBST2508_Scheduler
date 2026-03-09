@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
 
 
 
-    appcore.loadTestData();
+    //appcore.loadTestData();
+    appcore.loadFromGoogleSheets();
 
     engine.rootContext()->setContextProperty("appcore", &appcore);
 
