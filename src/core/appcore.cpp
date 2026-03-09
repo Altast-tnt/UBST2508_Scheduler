@@ -13,6 +13,7 @@ Appcore::Appcore(QObject *parent)
     : QObject{parent}
 {
     m_dayListModel = new DayListModel(this);
+    m_deadlinesDayListModel = new DayListModel(this);
     m_fileModel = new FileListModel(this);
     m_subjectDeadlinesModel = new DeadlineListModel(this);
     m_networkManager = new QNetworkAccessManager(this);
@@ -295,6 +296,21 @@ void Appcore::setDayListModel(DayListModel *newDayListModel)
     emit dayListModelChanged();
 }
 
+DayListModel *Appcore::deadlinesDayListModel() const
+{
+    return m_deadlinesDayListModel;
+}
+
+void Appcore::setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel)
+{
+    if (m_deadlinesDayListModel == newDeadlinesDayListModel)
+        return;
+    m_deadlinesDayListModel = newDeadlinesDayListModel;
+    emit deadlinesDayListModelChanged();
+}
+
+
+
 DeadlineListModel *Appcore::subjectDeadlinesModel() const
 {
      return m_subjectDeadlinesModel;
@@ -310,6 +326,15 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
     }
 
     QJsonObject rootObj = doc.object();
+
+    setCurrentSubject(nullptr);
+    setCurrentDeadline(nullptr);
+
+    m_dayListModel->clear();
+    m_deadlinesDayListModel->clear();
+
+    qDeleteAll(m_subjects);
+    m_subjects.clear();
 
     QJsonArray subjectsArray = rootObj["subjects"].toArray();
     QJsonArray scheduleArray = rootObj["schedule"].toArray();
@@ -357,7 +382,8 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
     }
     qDebug() << "Предметов загружено:" << m_subjects.count();
 
-    QMap<QDate, QList<Lesson*>> daysMap;
+    QMap<QDate, QList<Lesson*>> lessonsMap;
+    QMap<QDate, QList<Deadline*>> deadlinesMap;
 
     for (const QJsonValue &value : std::as_const(scheduleArray))
     {
@@ -420,34 +446,107 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         lesson->setEndTime(endTime);
         lesson->setDate(lessonDate);
 
-        daysMap[lessonDate].append(lesson);
+        lessonsMap[lessonDate].append(lesson);
 
     }
 
-    for (auto it = daysMap.begin(); it != daysMap.end(); ++it) {
+    for (const QJsonValue &value : std::as_const(deadlinesArray)) {
+        QJsonArray row = value.toArray();
 
-        // Создаем День
+        QString subjectName = row[0].toString();
+        QString dateStr     = row[1].toString();
+        QString timeStr     = row[2].toString();
+        QString typeStr     = row[3].toString();
+        QString descStr     = row[4].toString();
+
+
+        QDate dDate = QDate::fromString(dateStr, "dd.MM.yyyy");
+        if (!dDate.isValid()) dDate = QDate::fromString(dateStr, "d.M.yyyy");
+        if (!dDate.isValid()) dDate = QDate::fromString(dateStr, "d.M.yy");
+        if (!dDate.isValid()) continue;
+
+        QTime dTime = QTime::fromString(timeStr, "H:m:s");
+        if (!dTime.isValid()) dTime = QTime::fromString(timeStr, "H:m");
+
+
+        Subject *foundSubject = nullptr;
+        for (Subject *s : std::as_const(m_subjects)) {
+            if (s->name() == subjectName) {
+                foundSubject = s;
+                break;
+            }
+        }
+        if (!foundSubject) {
+            qWarning() << "Предмет для дедлайна не найден:" << subjectName;
+            continue;
+        }
+
+
+        Deadline::DeadlineType dType = Deadline::MAX_DEADLINETYPE;
+        typeStr = typeStr.trimmed().toUpper();
+        if (typeStr == "PR") dType = Deadline::PR;
+        else if (typeStr == "KR") dType = Deadline::KR;
+        else if (typeStr == "LAB") dType = Deadline::LAB;
+        else if (typeStr == "PRESENTATION") dType = Deadline::PRESENTATION;
+        else if (typeStr == "DOKLAD") dType = Deadline::DOKLAD;
+        else if (typeStr == "REFERAT") dType = Deadline::REFERAT;
+
+        Deadline* deadline = new Deadline(this);
+        deadline->setSubject(foundSubject);
+        deadline->setType(dType);
+        deadline->setDateTime(QDateTime(dDate, dTime));
+        deadline->setDescription(descStr);
+        deadline->setIsCompleted(false);
+
+        foundSubject->addDeadline(deadline);
+        deadlinesMap[dDate].append(deadline);
+    }
+
+    QList<QDate> allDates = lessonsMap.keys();
+    for (QDate d : deadlinesMap.keys()) {
+        if (!allDates.contains(d)) {
+            allDates.append(d);
+        }
+    }
+
+    // Сортируем дни хронологически (от старых к новым)
+    std::sort(allDates.begin(), allDates.end());
+
+    // Создаем дни и модели
+    for (QDate date : std::as_const(allDates)) {
         Day* day = new Day(this);
-        day->setDate(it.key());
+        day->setDate(date);
 
-        // Создаем Модель уроков для этого дня
-        ScheduleListModel* modelDay = new ScheduleListModel(day);
+        // Модель уроков (если в этот день нет уроков, value() вернет пустой список)
+        ScheduleListModel* sModel = new ScheduleListModel(day);
+        sModel->setLessons(lessonsMap.value(date));
+        day->setDailyModel(sModel);
 
-        // Отдаем модели готовый список уроков из коробки
-        modelDay->setLessons(it.value());
+        // Модель дедлайнов
+        DeadlineListModel* dModel = new DeadlineListModel(day);
+        dModel->setDeadlines(deadlinesMap.value(date));
+        day->setDailyDeadlines(dModel);
 
-        // Прикрепляем модель к Дню
-        day->setDailyModel(modelDay);
-
-        // Добавляем готовый День в главную модель интерфейса!
         m_dayListModel->addDay(day);
     }
 
-    if (!m_subjects.isEmpty()) {
-        setCurrentSubject(m_subjects.first());
-    }
+    for (QDate date : deadlinesMap.keys())
+    {
+        Day* deadlineDay = new Day(this);
+        deadlineDay->setDate(date);
 
-    qDebug() << "Загрузка завершена! Дней создано:" << daysMap.keys().count();
+        ScheduleListModel* sModel = new ScheduleListModel(deadlineDay);
+        sModel->setLessons(lessonsMap.value(date));
+        deadlineDay->setDailyModel(sModel);
+
+
+        DeadlineListModel* dModel = new DeadlineListModel(deadlineDay);
+        dModel->setDeadlines(deadlinesMap.value(date));
+        deadlineDay->setDailyDeadlines(dModel);
+
+        m_deadlinesDayListModel->addDay(deadlineDay);
+    }
 }
+
 
 

@@ -57,6 +57,9 @@ ColumnLayout {
         */
         DayBoard {
             innerModelRole: "deadlinesModelRole"
+
+            model: appcore.deadlinesDayListModel
+
             // Передаем кастомный делегат карточки дедлайна
             cardDelegate: Component {
                 DeadlineCard {

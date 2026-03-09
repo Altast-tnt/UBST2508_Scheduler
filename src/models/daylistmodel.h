@@ -66,6 +66,8 @@ public:
      */
     void addDay(Day* day);
 
+    void clear();
+
     /**
      * @brief Возвращает день из m_days (или nullptr, если день не найден) по переданной дате
      * @param date, константная ссылка на объект даты (QDate)

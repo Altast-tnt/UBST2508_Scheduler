@@ -73,6 +73,8 @@ Popup {
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.textPrimary
             Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
         }
 
         // Декоративный разделитель

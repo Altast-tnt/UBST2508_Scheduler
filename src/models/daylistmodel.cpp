@@ -50,6 +50,16 @@ void DayListModel::addDay(Day *day)
     endInsertRows();
 }
 
+void DayListModel::clear()
+{
+    if (m_days.isEmpty()) return;
+
+    beginResetModel();
+    qDeleteAll(m_days);
+    m_days.clear();
+    endResetModel();
+}
+
 Day *DayListModel::getDay(const QDate &date) const
 {
     for (auto day : m_days) {

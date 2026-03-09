@@ -54,6 +54,9 @@ Item {
                                    1, Math.floor(
                                        (mainScheduleView.width + mainScheduleView.spacing)
                                        / (Theme.columnWidthDayBoard + mainScheduleView.spacing)))
+
+    property var model: appcore.dayListModel
+
     // Горизонтальный список дней
     ListView {
         id: mainScheduleView
@@ -63,7 +66,7 @@ Item {
         clip: true
         snapMode: ListView.SnapToItem
         // модель дней
-        model: appcore.dayListModel
+        model: conteinerMain.model
 
         highlightMoveDuration: 300
 

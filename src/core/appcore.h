@@ -40,6 +40,7 @@ class Appcore : public QObject
      */
     Q_PROPERTY(ScheduleListModel* scheduleModel READ scheduleModel WRITE setScheduleModel NOTIFY scheduleModelChanged FINAL)
     Q_PROPERTY(DayListModel* dayListModel READ dayListModel WRITE setDayListModel NOTIFY dayListModelChanged FINAL)
+    Q_PROPERTY(DayListModel* deadlinesDayListModel READ deadlinesDayListModel WRITE setDeadlinesDayListModel NOTIFY deadlinesDayListModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* deadlineModel READ deadlineModel WRITE setDeadlineModel NOTIFY deadlineModelChanged FINAL)
     Q_PROPERTY(FileListModel* fileModel READ fileModel WRITE setFileModel NOTIFY fileModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* subjectDeadlinesModel READ subjectDeadlinesModel CONSTANT)
@@ -155,7 +156,10 @@ public:
      */
     DeadlineListModel* subjectDeadlinesModel() const;
 
- signals:
+    DayListModel *deadlinesDayListModel() const;
+    void setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel);
+
+signals:
     void currentSubjectChanged();
     void currentDeadlineChanged();
 
@@ -169,6 +173,8 @@ public:
 
     void dayListModelChanged();
 
+    void deadlinesDayListModelChanged();
+
 private:
     Subject *m_currentSubject = nullptr;
     Deadline *m_currentDeadline = nullptr;
@@ -177,10 +183,12 @@ private:
     DeadlineListModel *m_deadlineModel = nullptr;
     FileListModel *m_fileModel = nullptr;
     DayListModel *m_dayListModel = nullptr;
+    DayListModel *m_deadlinesDayListModel = nullptr;
     DeadlineListModel *m_subjectDeadlinesModel = nullptr;
     QNetworkAccessManager *m_networkManager;
 
     void parseAndApplyJson(const QByteArray &data);
+
 };
 
 #endif // APPCORE_H
