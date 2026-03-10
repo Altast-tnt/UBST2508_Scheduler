@@ -49,6 +49,12 @@ qt_add_qml_module(appUBST2508_Sheduler
         "assets/images/noDeadline.gif"
     SOURCES
         src/core/appcore.h src/core/appcore.cpp
+        src/core/constants.h
+        src/core/networkservice.h src/core/networkservice.cpp
+        src/core/typedefs.h
+        src/core/entityfactory.h
+        src/core/entityfactory.cpp
+        src/tests/testdatagenerator.h src/tests/testdatagenerator.cpp
         src/entities/commonTypes.h
         src/entities/subject.h src/entities/subject.cpp
         src/entities/deadline.h src/entities/deadline.cpp
@@ -58,12 +64,6 @@ qt_add_qml_module(appUBST2508_Sheduler
         src/models/daylistmodel.h src/models/daylistmodel.cpp
         src/models/deadlinelistmodel.h src/models/deadlinelistmodel.cpp
         src/models/filelistmodel.h src/models/filelistmodel.cpp
-        SOURCES src/core/constants.h
-        SOURCES src/core/networkservice.h src/core/networkservice.cpp
-        SOURCES src/core/typedefs.h
-        SOURCES src/core/entityfactory.h
-        SOURCES src/core/entityfactory.cpp
-
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

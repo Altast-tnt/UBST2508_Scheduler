@@ -58,15 +58,9 @@ public:
     explicit Appcore(QObject *parent = nullptr);
 
     /**
-     * @brief Загружает тестовые данные,
-     * заполняет:
-     * - m_subjects
-     * - m_dayListModel
-     * передает данные моделям:
-     * - ScheduleListModel
-     * - DeadlineListModel
+     * @brief Загружает данные,
+     * вызывая метод fetchGoogleSheetsData() из NetworkService
      */
-    Q_INVOKABLE void loadTestData();
 
     Q_INVOKABLE void loadFromGoogleSheets();
 

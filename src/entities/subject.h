@@ -161,6 +161,7 @@ signals:
 
 private:
     QString m_name;
+    // TODO: Сейчас списком преподы не могут грузиться из таблиц, подумать надо ли оно вообще
     QList<Teacher *> m_teachers;
     QList<File *> m_files;
     QList<Deadline *> m_deadlines;
