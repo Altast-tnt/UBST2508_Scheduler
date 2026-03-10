@@ -1,32 +1,37 @@
 #ifndef NETWORKSERVICE_H
 #define NETWORKSERVICE_H
 
-#include <QNetworkAccessManager>
 #include <QObject>
+#include <QNetworkAccessManager>
+#include <QByteArray>
+#include <QMap>
+#include <QDate>
+#include <QList>
 
-#include <src/entities/lesson.h>
-#include <src/entities/subject.h>
+#include "src/entities/subject.h"
+#include "src/entities/lesson.h"
+#include "src/entities/deadline.h"
+#include "src/core/typedefs.h"
 
 class NetworkService : public QObject
 {
     Q_OBJECT
 public:
     explicit NetworkService(QObject *parent = nullptr);
+
     void fetchGoogleSheetsData();
 
 signals:
     void dataReady(QList<Subject*> subjects,
-                   QMap<QDate, QList<Lesson*>> lessonsMap,
-                   QMap<QDate, QList<Deadline*>> deadlinesMap);
+                   LessonsMap lessonsMap,
+                   DeadlinesMap deadlinesMap);
+
     void fetchError(QString errorMessage);
 
 private:
-    QNetworkAccessManager* m_manager;
+    QNetworkAccessManager* m_networkManager;
 
-    // Модульные методы парсинга
-    QList<Subject*> parseSubjects(const QJsonArray& arr, const QJsonObject& filesMap);
-    QMap<QDate, QList<Lesson*>> parseSchedule(const QJsonArray& arr, const QList<Subject*>& subjects);
-    QMap<QDate, QList<Deadline*>> parseDeadlines(const QJsonArray& arr, const QList<Subject*>& subjects, const QJsonObject& filesMap);
+    void parseJson(const QByteArray &data);
 };
 
 #endif // NETWORKSERVICE_H

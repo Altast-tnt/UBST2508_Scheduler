@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<File>("UBST2508_Sheduler", 1, 0, "File", "Get from models only");
 
     qRegisterMetaType<File*>("File*");
+    qRegisterMetaType<LessonsMap>("LessonsMap");
+    qRegisterMetaType<DeadlinesMap>("DeadlinesMap");
 
     Appcore appcore;
     QQmlApplicationEngine engine;

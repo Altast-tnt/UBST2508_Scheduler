@@ -8,6 +8,7 @@
 
 #include "src/entities/deadline.h"
 #include "src/entities/subject.h"
+#include "src/core/networkservice.h"
 
 #include "src/models/schedulelistmodel.h"
 #include "src/models/daylistmodel.h"
@@ -207,8 +208,10 @@ private:
     DayListModel *m_deadlinesDayListModel = nullptr;
     DeadlineListModel *m_subjectDeadlinesModel = nullptr;
     QNetworkAccessManager *m_networkManager;
+    NetworkService* m_netService = nullptr;
 
-    void parseAndApplyJson(const QByteArray &data);
+private slots:
+    void onDataReady(QList<Subject*> subjects, LessonsMap lessonsMap, DeadlinesMap deadlinesMap);
 
 
 };
