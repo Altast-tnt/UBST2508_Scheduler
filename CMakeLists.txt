@@ -61,6 +61,8 @@ qt_add_qml_module(appUBST2508_Sheduler
         SOURCES src/core/constants.h
         SOURCES src/core/networkservice.h src/core/networkservice.cpp
         SOURCES src/core/typedefs.h
+        SOURCES src/core/entityfactory.h
+        SOURCES src/core/entityfactory.cpp
 
 )
 

@@ -9,8 +9,6 @@
 #include <QList>
 
 #include "src/entities/subject.h"
-#include "src/entities/lesson.h"
-#include "src/entities/deadline.h"
 #include "src/core/typedefs.h"
 
 class NetworkService : public QObject
@@ -38,6 +36,13 @@ private:
     QNetworkAccessManager* m_networkManager;
 
     void parseJson(const QByteArray &data);
+
+    QDate parseDate(const QString &dateStr);
+    QTime parseTime(const QString &timeStr);
+
+    QList<Subject*> parseSubjects(const QJsonArray& subjectsArray, const QJsonObject& allFilesMap);
+    LessonsMap parseSchedule(const QJsonArray& scheduleArray, const QList<Subject*>& subjects);
+    DeadlinesMap parseDeadlines(const QJsonArray& deadlinesArray, const QJsonObject& allFilesMap, const QList<Subject*>& subjects);
 };
 
 #endif // NETWORKSERVICE_H

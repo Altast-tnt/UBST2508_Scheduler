@@ -3,8 +3,6 @@
 
 #include <QObject>
 #include <QList>
-#include <QNetworkAccessManager>
-#include <QSettings>
 
 #include "src/entities/deadline.h"
 #include "src/entities/subject.h"
@@ -200,6 +198,7 @@ private:
     Subject *m_currentSubject = nullptr;
     Deadline *m_currentDeadline = nullptr;
     QList<Subject *> m_subjects;
+
     FileListModel *m_subjectFileModel = nullptr;
     FileListModel *m_deadlineFileModel = nullptr;
     ScheduleListModel *m_scheduleModel = nullptr;
@@ -207,7 +206,7 @@ private:
     DayListModel *m_dayListModel = nullptr;
     DayListModel *m_deadlinesDayListModel = nullptr;
     DeadlineListModel *m_subjectDeadlinesModel = nullptr;
-    QNetworkAccessManager *m_networkManager;
+
     NetworkService* m_netService = nullptr;
 
 private slots:

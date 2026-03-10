@@ -1,5 +1,6 @@
 #include "networkservice.h"
 #include "src/core/constants.h"
+#include "src/core/entityfactory.h"
 #include "src/entities/commonTypes.h"
 
 #include <QFile>
@@ -66,66 +67,68 @@ void NetworkService::downloadFile(const QString &url, const QString &savePath, F
 
 void NetworkService::parseJson(const QByteArray &data)
 {
-    QList<Subject*> parsedSubjects;
-    QJsonDocument doc = QJsonDocument::fromJson(data);
 
+
+    QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || !doc.isObject())
     {
         qWarning() << "Ошибка: JSON не является объектом!";
         return;
     }
-
     QJsonObject rootObj = doc.object();
 
+    auto subjects = parseSubjects(rootObj["subjects"].toArray(), rootObj["driveFiles"].toObject());
+    auto lessons = parseSchedule(rootObj["schedule"].toArray(), subjects);
+    auto deadlines = parseDeadlines(rootObj["deadlines"].toArray(), rootObj["driveFiles"].toObject(), subjects);
+
+    qDebug() << "Предметов загружено:" << subjects.count();
+
+    emit dataReady(subjects, lessons, deadlines);
+}
+
+QDate NetworkService::parseDate(const QString &dateStr)
+{
+    QDate d = QDate::fromString(dateStr, "dd.MM.yyyy");
+    if (!d.isValid()) d = QDate::fromString(dateStr, "d.M.yyyy");
+    if (!d.isValid()) d = QDate::fromString(dateStr, "d.M.yy");
+    if (!d.isValid()) qWarning() << "ПРОПУСК: Кривая дата:" << dateStr;
+    return d;
+}
+
+QTime NetworkService::parseTime(const QString &timeStr)
+{
+    QTime t = QTime::fromString(timeStr, "H:m:s");
+    if (!t.isValid()) t = QTime::fromString(timeStr, "H:m");
+    if (!t.isValid()) qWarning() << "Кривое время:" << timeStr;
+    return t;
+}
+
+QList<Subject *> NetworkService::parseSubjects(const QJsonArray &subjectsArray, const QJsonObject &allFilesMap)
+{
+    QList<Subject*> parsedSubjects;
     QSettings settings(Config::OrgName, Config::AppName);
-
-    QJsonArray subjectsArray = rootObj["subjects"].toArray();
-    QJsonArray scheduleArray = rootObj["schedule"].toArray();
-    QJsonArray deadlinesArray = rootObj["deadlines"].toArray();
-
-    QJsonObject allFilesMap = rootObj["driveFiles"].toObject();
 
     for (const QJsonValue &value : std::as_const(subjectsArray))
     {
-        QJsonArray row = value.toArray();
+        Subject* subj = EntityFactory::createSubject(value.toArray());
 
-        // Получаем данные из JSON
-        QString subjectName = row[0].toString();
-        QString teacherName = row[1].toString();
-        QString teacherEmail = row[2].toString();
-        QString examTypeStr = row[3].toString();
-
-        Subject::SubjectType sType = Subject::strToType(examTypeStr);
-
-        // Создаем учителя
-        Teacher *teach = new Teacher();
-        teach->setName(teacherName);
-        teach->setEmail(teacherEmail);
-
-        // Создаем предмет
-        Subject *subj = new Subject();
-        subj->addTeacher(teach);
-        subj->setName(subjectName);
-        subj->setType(sType);
-
-
-        QJsonObject subjectFilesInfo = allFilesMap[subjectName].toObject();
+        QJsonObject subjectFilesInfo = allFilesMap[subj->name()].toObject();
         QJsonArray commonFiles = subjectFilesInfo["common"].toArray();
 
         for (const QJsonValue &fileVal : std::as_const(commonFiles))
         {
-            QJsonObject fileObj = fileVal.toObject(); // Превращаем значение в объект
+            QJsonObject fileObj = fileVal.toObject();
 
             QString fileName = fileObj["name"].toString();
             QString fileUrl  = fileObj["url"].toString();
             QString typeStr  = fileObj["type"].toString().toUpper();
 
-            // 1. Превращаем строку "PDF" в твой Enum FileType
+            // Превращаем строку в Enum FileType
             File::FileType fType = File::strToType(typeStr);
 
-            // 2. Создаем объект файла
+            // Создаем объект файла
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
-            File *file = new File(fileName, fileUrl, "", fType, subjectName, subj);
+            File *file = new File(fileName, fileUrl, "", fType, subj->name(), subj);
 
             QString savedPath = settings.value(Config::filePathKey(file->subjectName(), file->name()), "").toString();
 
@@ -145,168 +148,95 @@ void NetworkService::parseJson(const QByteArray &data)
             subj->addFile(file);
         }
 
-        // Добавляем в общий список AppCore
         parsedSubjects.append(subj);
     }
-    qDebug() << "Предметов загружено:" << parsedSubjects.count();
+    return parsedSubjects;
+}
 
-    QMap<QDate, QList<Lesson*>> lessonsMap;
-    QMap<QDate, QList<Deadline*>> deadlinesMap;
+LessonsMap NetworkService::parseSchedule(const QJsonArray &scheduleArray, const QList<Subject *> &subjects)
+{
+    LessonsMap lessonsMap;
 
     for (const QJsonValue &value : std::as_const(scheduleArray))
     {
         QJsonArray row = value.toArray();
-
-        QString dateStr = row[0].toString();
-        QString startTimeStr = row[1].toString();
-        QString endTimeStr = row[2].toString();
         QString subjectName = row[3].toString();
-        QString lessonTypeStr = row[4].toString();
 
-        QDate lessonDate = QDate::fromString(dateStr, "dd.MM.yyyy");
-        if (!lessonDate.isValid()) lessonDate = QDate::fromString(dateStr, "d.M.yyyy");
-        if (!lessonDate.isValid()) lessonDate = QDate::fromString(dateStr, "d.M.yy"); // Для 22.4.26
-
-        // Защита: если дата всё равно сломана, просто выкидываем этот урок
-        if (!lessonDate.isValid())
-        {
-            qWarning() << "ПРОПУСК: Кривая дата в таблице:" << dateStr;
-            continue;
-        }
-
-        // H - часы без обязательного нуля (9 или 09), m - минуты (30), s - секунды
-        QTime startTime = QTime::fromString(startTimeStr, "H:m:s");
-        if (!startTime.isValid()) startTime = QTime::fromString(startTimeStr, "H:m"); // Если секунд нет
-
-        QTime endTime = QTime::fromString(endTimeStr, "H:m:s");
-        if (!endTime.isValid()) endTime = QTime::fromString(endTimeStr, "H:m");
-
-        // Защита: если время сломано, выводим в лог, но можем оставить (QML просто не покажет его)
-        if (!startTime.isValid())
-        {
-            qWarning() << "Кривое время старта:" << startTimeStr << "у предмета" << subjectName;
-        }
-
+        // Ищем предмет
         Subject *foundSubject = nullptr;
-        for (Subject *s : std::as_const(parsedSubjects))
+        for (Subject *s : std::as_const(subjects))
         {
-            if (s->name() == subjectName)
-            {
-                foundSubject = s;
-                break;
-            }
+            if (s->name() == subjectName) { foundSubject = s; break; }
         }
+        if (!foundSubject) continue;
 
-        if (!foundSubject)
-        {
-            qWarning() << "Предмет не найден:" << subjectName;
-            continue;
-        }
+        // 1. Парсим дату
+        QDate lessonDate = parseDate(row[0].toString());
+        if (!lessonDate.isValid()) continue; // Если дата кривая — пропускаем урок
 
-        Lesson::LessonType lType = Lesson::strToType(lessonTypeStr);
+        // Парсим время
+        QTime startTime = parseTime(row[1].toString());
+        QTime endTime = parseTime(row[2].toString());
 
-        Lesson *lesson = new Lesson();
-        lesson->setSubject(foundSubject);
-        lesson->setType(lType);
-        lesson->setStartTime(startTime);
-        lesson->setEndTime(endTime);
-        lesson->setDate(lessonDate);
+        // Вызываем Фабрику
+        Lesson* lesson = EntityFactory::createLesson(row, foundSubject, lessonDate, startTime, endTime);
 
         lessonsMap[lessonDate].append(lesson);
-
     }
+    return lessonsMap;
+}
+
+DeadlinesMap NetworkService::parseDeadlines(const QJsonArray &deadlinesArray, const QJsonObject &allFilesMap, const QList<Subject *> &subjects)
+{
+    DeadlinesMap deadlinesMap;
+    QSettings settings(Config::OrgName, Config::AppName);
 
     for (const QJsonValue &value : std::as_const(deadlinesArray))
     {
         QJsonArray row = value.toArray();
-
         QString subjectName = row[0].toString();
-        QString dateStr     = row[1].toString();
-        QString timeStr     = row[2].toString();
-        QString typeStr     = row[3].toString();
-        QString descStr     = row[4].toString();
 
+        // Ищем предмет
+        Subject *foundSubject = nullptr;
+        for (Subject *s : std::as_const(subjects))
+        {
+            if (s->name() == subjectName) { foundSubject = s; break; }
+        }
+        if (!foundSubject) continue;
 
-        QJsonObject subjectFilesInfo = allFilesMap[subjectName].toObject();
-
-        QDate dDate = QDate::fromString(dateStr, "dd.MM.yyyy");
-        if (!dDate.isValid()) dDate = QDate::fromString(dateStr, "d.M.yyyy");
-        if (!dDate.isValid()) dDate = QDate::fromString(dateStr, "d.M.yy");
+        // Парсим дату и время
+        QDate dDate = parseDate(row[1].toString());
+        QTime dTime = parseTime(row[2].toString());
         if (!dDate.isValid()) continue;
 
-        QTime dTime = QTime::fromString(timeStr, "H:m:s");
-        if (!dTime.isValid()) dTime = QTime::fromString(timeStr, "H:m");
+        // Фабрика создает объект
+        Deadline* deadline = EntityFactory::createDeadline(row, foundSubject, QDateTime(dDate, dTime));
 
-
-        Subject *foundSubject = nullptr;
-        for (Subject *s : std::as_const(parsedSubjects)) {
-            if (s->name() == subjectName)
-            {
-                foundSubject = s;
-                break;
-            }
-        }
-        if (!foundSubject)
-        {
-            qWarning() << "Предмет для дедлайна не найден:" << subjectName;
-            continue;
-        }
-
-
-        Deadline::DeadlineType dType = Deadline::strToType(typeStr);
-
-        Deadline* deadline = new Deadline();
-        deadline->setSubject(foundSubject);
-        deadline->setType(dType);
-        deadline->setDateTime(QDateTime(dDate, dTime));
-        deadline->setDescription(descStr);
-        deadline->setIsCompleted(false);
-
-
+        // Восстанавливаем галочку из QSettings
         QString key = Config::deadlineStatusKey(deadline->dateTime().toString(), deadline->description());
         deadline->setIsCompleted(settings.value(key, false).toBool());
 
-
+        // Парсим файлы для этого дедлайна
         QString folderKey = deadline->dateTime().toString("HH:mm dd.MM.yy");
+        QJsonObject subjectFilesInfo = allFilesMap[subjectName].toObject();
         QJsonArray deadlineFiles = subjectFilesInfo["deadlines"].toObject()[folderKey].toArray();
 
         for (const QJsonValue &fileVal : std::as_const(deadlineFiles))
         {
-            QJsonObject fileObj = fileVal.toObject(); // Превращаем значение в объект
+            QJsonObject fileObj = fileVal.toObject();
+            File *file = new File(fileObj["name"].toString(), fileObj["url"].toString(), "",
+                                  File::strToType(fileObj["type"].toString().toUpper()),
+                                  subjectName, deadline);
 
-            QString fileName = fileObj["name"].toString();
-            QString fileUrl  = fileObj["url"].toString();
-            QString typeStr  = fileObj["type"].toString().toUpper();
-
-            // 1. Превращаем строку в Enum FileType
-            File::FileType fType = File::strToType(typeStr);
-
-            // 2. Создаем объект файла
-            // Путь (path) пока оставляем пустым, так как файл еще не на диске
-            File *file = new File(fileName, fileUrl, "", fType, subjectName, deadline);
-
-            QString savedPath = settings.value(Config::filePathKey(file->subjectName(), file->name()), "").toString();
-
-            if (!savedPath.isEmpty())
-            {
-                // Проверяем, что файл всё еще реально существует на диске
-                if (QFile::exists(savedPath))
-                {
-                    file->setPath(savedPath);
-                } else
-                {
-                    // Если пользователь удалил файл руками — чистим настройку
-                    settings.remove(Config::filePathKey(file->subjectName(), file->name()));
-                }
-            }
+            // Проверка кэша
+            QString savedPath = settings.value(Config::filePathKey(subjectName, file->name()), "").toString();
+            if (QFile::exists(savedPath)) file->setPath(savedPath);
 
             deadline->addFile(file);
         }
 
-
         foundSubject->addDeadline(deadline);
         deadlinesMap[dDate].append(deadline);
     }
-
-    emit dataReady(parsedSubjects, lessonsMap, deadlinesMap);
+    return deadlinesMap;
 }

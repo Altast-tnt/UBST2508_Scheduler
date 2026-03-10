@@ -3,14 +3,9 @@
 #include "src/entities/commonTypes.h"
 #include "constants.h"
 
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
 #include <QFile>
 #include <QFileDialog>
+#include <QSettings>
 
 Appcore::Appcore(QObject *parent)
     : QObject{parent}
@@ -20,7 +15,6 @@ Appcore::Appcore(QObject *parent)
     m_subjectFileModel = new FileListModel(this);
     m_deadlineFileModel = new FileListModel(this);
     m_subjectDeadlinesModel = new DeadlineListModel(this);
-    m_networkManager = new QNetworkAccessManager(this);
 
     m_netService = new NetworkService(this);
     connect(m_netService, &NetworkService::dataReady, this, &Appcore::onDataReady);
