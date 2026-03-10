@@ -24,6 +24,7 @@ Appcore::Appcore(QObject *parent)
 
     m_netService = new NetworkService(this);
     connect(m_netService, &NetworkService::dataReady, this, &Appcore::onDataReady);
+    connect(m_netService, &NetworkService::fileDownloaded, this, &Appcore::onFileDownloaded);
 }
 
 void Appcore::loadTestData()
@@ -192,14 +193,17 @@ void Appcore::setCurrentSubject(Subject *newCurrentSubject)
     m_currentSubject = newCurrentSubject;
 
     if (m_currentSubject) {
-        if (m_subjectFileModel) {
+        if (m_subjectFileModel)
+        {
             m_subjectFileModel->setFiles(m_currentSubject->files());
         }
 
-        if (m_subjectDeadlinesModel) {
+        if (m_subjectDeadlinesModel)
+        {
             m_subjectDeadlinesModel->setDeadlines(m_currentSubject->deadlines());
         }
-    } else {
+    } else
+    {
         if (m_subjectFileModel) m_subjectFileModel->setFiles({});
         if (m_subjectDeadlinesModel) m_subjectDeadlinesModel->setDeadlines({});
     }
@@ -218,11 +222,13 @@ void Appcore::setCurrentDeadline(Deadline *newCurrentDeadline)
         return;
     m_currentDeadline = newCurrentDeadline;
 
-    if (m_currentDeadline) {
+    if (m_currentDeadline)
+    {
         m_currentSubject = m_currentDeadline->subject();
         emit currentSubjectChanged();
 
-        if (m_deadlineFileModel) {
+        if (m_deadlineFileModel)
+        {
             m_deadlineFileModel->setFiles(m_currentDeadline->files());
         }
     }
@@ -329,64 +335,63 @@ void Appcore::saveDeadlineStatus(Deadline *deadline)
 
 void Appcore::downloadFile(File *file)
 {
-    qDebug() << "Попытка скачать файл...";
-    if (!file) {
-        qWarning() << "ОШИБКА: Объект File пуст!";
+    if (!file) return;
+
+    // Защита от повторного скачивания: если файл уже есть на диске, ничего не делаем
+    if (!file->path().isEmpty() && QFile::exists(file->path()))
+    {
         return;
     }
-    qDebug() << "Имя файла:" << file->name();
-    qDebug() << "URL:" << file->url();
 
+    // Спрашиваем путь у пользователя (UI)
     QString savePath = QFileDialog::getSaveFileName(nullptr, "Сохранить файл", file->name());
-    if (savePath == "") return;
+    if (savePath.isEmpty()) return; // Пользователь нажал "Отмена"
 
-    QNetworkRequest request(QUrl(file->url()));
-    QNetworkReply* reply = m_networkManager->get(request);
-
-    connect(reply, &QNetworkReply::finished, this, [this, file, savePath, reply]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray response = reply->readAll();
-
-            QFile f(savePath);
-            if (f.open(QIODevice::WriteOnly)) {
-                f.write(response);
-                f.close();
-
-                // Обновляем объект и сохраняем путь
-                file->setPath(savePath);
-                QSettings settings(Config::OrgName, Config::AppName);
-                settings.setValue(Config::filePathKey(file->subjectName(), file->name()), savePath);
-
-                for (Subject* subj : std::as_const(m_subjects))
-                {
-                    for (File* f : subj->files())
-                    {
-                        if (f->name() == file->name() && subj->name() == file->subjectName())
-                        {
-                            f->setPath(savePath);
-                        }
-                    }
-                    for (Deadline* d : subj->deadlines()) {
-                        for (File* f : d->files()) {
-                            if (f->name() == file->name() && subj->name() == file->subjectName())
-                            {
-                                f->setPath(savePath);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            qWarning() << "Ошибка загрузки:" << reply->errorString();
-        }
-        reply->deleteLater();
-    });
+    // Даем команду (Сеть)
+    m_netService->downloadFile(file->url(), savePath, file);
 }
 
 void Appcore::refreshSubjectFiles()
 {
-    if (m_currentSubject && m_subjectFileModel) {
+    if (m_currentSubject && m_subjectFileModel)
+    {
         m_subjectFileModel->setFiles(m_currentSubject->files());
+    }
+}
+
+void Appcore::onFileDownloaded(File *file, const QString &savePath)
+{
+    if (!file) return;
+
+    // Обновляем объект
+    file->setPath(savePath);
+
+    // Сохраняем в кэш (чтобы помнить после перезагрузки)
+    QSettings settings(Config::OrgName, Config::AppName);
+    settings.setValue(Config::filePathKey(file->subjectName(), file->name()), savePath);
+
+    // Синхронизируем дубликаты во всех предметах и дедлайнах!
+    for (Subject* subj : std::as_const(m_subjects))
+    {
+        // Проверяем общие файлы предмета
+        for (File* f : subj->files())
+        {
+            if (f->name() == file->name() && f->subjectName() == file->subjectName())
+            {
+                f->setPath(savePath);
+            }
+        }
+        // Проверяем файлы дедлайнов
+        for (Deadline* d : subj->deadlines())
+        {
+            for (File* f : d->files())
+            {
+                if (f->name() == file->name() && f->subjectName() == file->subjectName())
+                {
+                    f->setPath(savePath);
+                }
+            }
+        }
     }
 }
 
@@ -413,8 +418,10 @@ void Appcore::onDataReady(QList<Subject *> subjects, QMap<QDate, QList<Lesson *>
 
     // Формирование UI-моделей
     QList<QDate> allDates = lessonsMap.keys();
-    for (QDate d : deadlinesMap.keys()) {
-        if (!allDates.contains(d)) {
+    for (QDate d : deadlinesMap.keys())
+    {
+        if (!allDates.contains(d))
+        {
             allDates.append(d);
         }
     }
@@ -423,7 +430,8 @@ void Appcore::onDataReady(QList<Subject *> subjects, QMap<QDate, QList<Lesson *>
     std::sort(allDates.begin(), allDates.end());
 
     // Создаем дни и модели
-    for (QDate date : std::as_const(allDates)) {
+    for (QDate date : std::as_const(allDates))
+    {
         Day* day = new Day(this);
         day->setDate(date);
 

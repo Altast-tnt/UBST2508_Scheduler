@@ -5,6 +5,17 @@ Lesson::Lesson(QObject *parent)
     : QObject{parent}
 {}
 
+Lesson::LessonType Lesson::strToType(const QString &typeStr)
+{
+    if (typeStr == "LECTION") return Lesson::LECTION;
+    else if (typeStr == "PRAKTIK") return Lesson::PRAKTIK;
+    else if (typeStr == "LAB") return Lesson::LAB;
+    else if (typeStr == "KONTROL") return Lesson::KONTROL;
+    else if (typeStr == "EXAM") return Lesson::EXAM;
+    else if (typeStr == "RETAKE") return Lesson::RETAKE;
+    else return Lesson::MAX_TYPES;
+}
+
 Lesson::LessonType Lesson::type() const
 {
     return m_type;

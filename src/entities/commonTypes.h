@@ -193,6 +193,13 @@ public:
     FileType type() const;
 
     /**
+     * @brief Возвращает тип файла из строки typeStr (для парсинга)
+     * @param typeStr, константная ссылка на строку с наименованием типа
+     * @return FileType
+     */
+    static FileType strToType(const QString &typeStr);
+
+    /**
      * @brief Возвращает ссылку на скачивание файла, установленный в m_url
      * @return QString
      */
@@ -254,6 +261,18 @@ inline void File::setSubjectName(const QString &newSubjectName)
 inline File::FileType File::type() const
 {
     return m_type;
+}
+
+inline File::FileType File::strToType(const QString &typeStr)
+{
+    if (typeStr == "PDF") return File::PDF;
+    else if (typeStr == "XLSX") return File::XLSX;
+    else if (typeStr == "XLS") return File::XLS;
+    else if (typeStr == "PPTX") return File::PPTX;
+    else if (typeStr == "PPT") return File::PPT;
+    else if (typeStr == "DOCX") return File::DOCX;
+    else if (typeStr == "DOC") return File::DOC;
+    else return File::MAX_TYPES;
 }
 
 inline QString File::path() const

@@ -3,6 +3,7 @@
 #include "src/entities/commonTypes.h"
 
 #include <QFile>
+#include <QFileDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -13,7 +14,6 @@ NetworkService::NetworkService(QObject *parent)
     : QObject{parent}
 {
     m_networkManager = new QNetworkAccessManager(this);
-
 }
 
 void NetworkService::fetchGoogleSheetsData()
@@ -22,9 +22,43 @@ void NetworkService::fetchGoogleSheetsData()
     QNetworkReply* reply = m_networkManager->get(request);
 
     connect(reply, &QNetworkReply::finished, this, [=]() {
-        if (reply->error() == QNetworkReply::NoError) {
+        if (reply->error() == QNetworkReply::NoError)
+        {
             QByteArray response = reply->readAll();
             parseJson(response);
+        }
+        reply->deleteLater();
+    });
+}
+
+void NetworkService::downloadFile(const QString &url, const QString &savePath, File *fileObj)
+{
+    if (!fileObj || url.isEmpty() || savePath.isEmpty()) return;
+
+    QNetworkRequest request((QUrl(url)));
+    QNetworkReply* reply = m_networkManager->get(request);
+
+    // Захватываем this (чтобы сделать emit), fileObj и savePath
+    connect(reply, &QNetworkReply::finished, this,[this, fileObj, savePath, reply]() {
+        if (reply->error() == QNetworkReply::NoError)
+        {
+            QByteArray response = reply->readAll();
+
+            QFile f(savePath);
+            if (f.open(QIODevice::WriteOnly))
+            {
+                f.write(response);
+                f.close();
+
+
+                emit fileDownloaded(fileObj, savePath);
+            } else
+            {
+                emit fetchError("Не удалось открыть файл для записи");
+            }
+        } else
+        {
+            emit fetchError("Ошибка загрузки файла: " + reply->errorString());
         }
         reply->deleteLater();
     });
@@ -35,7 +69,8 @@ void NetworkService::parseJson(const QByteArray &data)
     QList<Subject*> parsedSubjects;
     QJsonDocument doc = QJsonDocument::fromJson(data);
 
-    if (doc.isNull() || !doc.isObject()) {
+    if (doc.isNull() || !doc.isObject())
+    {
         qWarning() << "Ошибка: JSON не является объектом!";
         return;
     }
@@ -50,13 +85,8 @@ void NetworkService::parseJson(const QByteArray &data)
 
     QJsonObject allFilesMap = rootObj["driveFiles"].toObject();
 
-
-
-
     for (const QJsonValue &value : std::as_const(subjectsArray))
     {
-
-
         QJsonArray row = value.toArray();
 
         // Получаем данные из JSON
@@ -65,19 +95,7 @@ void NetworkService::parseJson(const QByteArray &data)
         QString teacherEmail = row[2].toString();
         QString examTypeStr = row[3].toString();
 
-        Subject::SubjectType sType = Subject::MAX_TYPES;
-        examTypeStr = examTypeStr.trimmed().toUpper();
-
-        if (examTypeStr == "EXAM")
-        {
-            sType = Subject::EXAM;
-        } else if (examTypeStr == "CREDIT")
-        {
-            sType = Subject::CREDIT;
-        } else if (examTypeStr == "CREDITWITHGRADE")
-        {
-            sType = Subject::CREDITWITHGRADE;
-        }
+        Subject::SubjectType sType = Subject::strToType(examTypeStr);
 
         // Создаем учителя
         Teacher *teach = new Teacher();
@@ -94,7 +112,8 @@ void NetworkService::parseJson(const QByteArray &data)
         QJsonObject subjectFilesInfo = allFilesMap[subjectName].toObject();
         QJsonArray commonFiles = subjectFilesInfo["common"].toArray();
 
-        for (const QJsonValue &fileVal : std::as_const(commonFiles)) {
+        for (const QJsonValue &fileVal : std::as_const(commonFiles))
+        {
             QJsonObject fileObj = fileVal.toObject(); // Превращаем значение в объект
 
             QString fileName = fileObj["name"].toString();
@@ -102,11 +121,7 @@ void NetworkService::parseJson(const QByteArray &data)
             QString typeStr  = fileObj["type"].toString().toUpper();
 
             // 1. Превращаем строку "PDF" в твой Enum FileType
-            File::FileType fType = File::MAX_TYPES;
-            if (typeStr == "PDF") fType = File::PDF;
-            else if (typeStr == "XLSX" || typeStr == "XLS") fType = File::XLSX;
-            else if (typeStr == "PPTX" || typeStr == "PPT") fType = File::PPTX;
-            else if (typeStr == "DOCX" || typeStr == "DOC") fType = File::DOCX;
+            File::FileType fType = File::strToType(typeStr);
 
             // 2. Создаем объект файла
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
@@ -114,11 +129,14 @@ void NetworkService::parseJson(const QByteArray &data)
 
             QString savedPath = settings.value(Config::filePathKey(file->subjectName(), file->name()), "").toString();
 
-            if (!savedPath.isEmpty()) {
+            if (!savedPath.isEmpty())
+            {
                 // Проверяем, что файл всё еще реально существует на диске
-                if (QFile::exists(savedPath)) {
+                if (QFile::exists(savedPath))
+                {
                     file->setPath(savedPath);
-                } else {
+                } else
+                {
                     // Если пользователь удалил файл руками — чистим настройку
                     settings.remove(Config::filePathKey(file->subjectName(), file->name()));
                 }
@@ -149,8 +167,9 @@ void NetworkService::parseJson(const QByteArray &data)
         if (!lessonDate.isValid()) lessonDate = QDate::fromString(dateStr, "d.M.yyyy");
         if (!lessonDate.isValid()) lessonDate = QDate::fromString(dateStr, "d.M.yy"); // Для 22.4.26
 
-        // Защита: если дата всё равно сломана, просто выкидываем этот урок!
-        if (!lessonDate.isValid()) {
+        // Защита: если дата всё равно сломана, просто выкидываем этот урок
+        if (!lessonDate.isValid())
+        {
             qWarning() << "ПРОПУСК: Кривая дата в таблице:" << dateStr;
             continue;
         }
@@ -163,31 +182,28 @@ void NetworkService::parseJson(const QByteArray &data)
         if (!endTime.isValid()) endTime = QTime::fromString(endTimeStr, "H:m");
 
         // Защита: если время сломано, выводим в лог, но можем оставить (QML просто не покажет его)
-        if (!startTime.isValid()) {
+        if (!startTime.isValid())
+        {
             qWarning() << "Кривое время старта:" << startTimeStr << "у предмета" << subjectName;
         }
 
         Subject *foundSubject = nullptr;
-        for (Subject *s : std::as_const(parsedSubjects)) {
-            if (s->name() == subjectName) {
+        for (Subject *s : std::as_const(parsedSubjects))
+        {
+            if (s->name() == subjectName)
+            {
                 foundSubject = s;
                 break;
             }
         }
 
-        if (!foundSubject) {
+        if (!foundSubject)
+        {
             qWarning() << "Предмет не найден:" << subjectName;
             continue;
         }
 
-        Lesson::LessonType lType = Lesson::MAX_TYPES;
-        lessonTypeStr = lessonTypeStr.trimmed().toUpper();
-        if (lessonTypeStr == "LECTION") lType = Lesson::LECTION;
-        else if (lessonTypeStr == "PRAKTIK") lType = Lesson::PRAKTIK;
-        else if (lessonTypeStr == "LAB") lType = Lesson::LAB;
-        else if (lessonTypeStr == "KONTROL") lType = Lesson::KONTROL;
-        else if (lessonTypeStr == "EXAM") lType = Lesson::EXAM;
-        else if (lessonTypeStr == "RETAKE") lType = Lesson::RETAKE;
+        Lesson::LessonType lType = Lesson::strToType(lessonTypeStr);
 
         Lesson *lesson = new Lesson();
         lesson->setSubject(foundSubject);
@@ -200,7 +216,8 @@ void NetworkService::parseJson(const QByteArray &data)
 
     }
 
-    for (const QJsonValue &value : std::as_const(deadlinesArray)) {
+    for (const QJsonValue &value : std::as_const(deadlinesArray))
+    {
         QJsonArray row = value.toArray();
 
         QString subjectName = row[0].toString();
@@ -223,25 +240,20 @@ void NetworkService::parseJson(const QByteArray &data)
 
         Subject *foundSubject = nullptr;
         for (Subject *s : std::as_const(parsedSubjects)) {
-            if (s->name() == subjectName) {
+            if (s->name() == subjectName)
+            {
                 foundSubject = s;
                 break;
             }
         }
-        if (!foundSubject) {
+        if (!foundSubject)
+        {
             qWarning() << "Предмет для дедлайна не найден:" << subjectName;
             continue;
         }
 
 
-        Deadline::DeadlineType dType = Deadline::MAX_DEADLINETYPE;
-        typeStr = typeStr.trimmed().toUpper();
-        if (typeStr == "PR") dType = Deadline::PR;
-        else if (typeStr == "KR") dType = Deadline::KR;
-        else if (typeStr == "LAB") dType = Deadline::LAB;
-        else if (typeStr == "PRESENTATION") dType = Deadline::PRESENTATION;
-        else if (typeStr == "DOKLAD") dType = Deadline::DOKLAD;
-        else if (typeStr == "REFERAT") dType = Deadline::REFERAT;
+        Deadline::DeadlineType dType = Deadline::strToType(typeStr);
 
         Deadline* deadline = new Deadline();
         deadline->setSubject(foundSubject);
@@ -258,19 +270,16 @@ void NetworkService::parseJson(const QByteArray &data)
         QString folderKey = deadline->dateTime().toString("HH:mm dd.MM.yy");
         QJsonArray deadlineFiles = subjectFilesInfo["deadlines"].toObject()[folderKey].toArray();
 
-        for (const QJsonValue &fileVal : std::as_const(deadlineFiles)) {
+        for (const QJsonValue &fileVal : std::as_const(deadlineFiles))
+        {
             QJsonObject fileObj = fileVal.toObject(); // Превращаем значение в объект
 
             QString fileName = fileObj["name"].toString();
             QString fileUrl  = fileObj["url"].toString();
             QString typeStr  = fileObj["type"].toString().toUpper();
 
-            // 1. Превращаем строку "PDF" в твой Enum FileType
-            File::FileType fType = File::MAX_TYPES;
-            if (typeStr == "PDF") fType = File::PDF;
-            else if (typeStr == "XLSX" || typeStr == "XLS") fType = File::XLSX;
-            else if (typeStr == "PPTX" || typeStr == "PPT") fType = File::PPTX;
-            else if (typeStr == "DOCX" || typeStr == "DOC") fType = File::DOCX;
+            // 1. Превращаем строку в Enum FileType
+            File::FileType fType = File::strToType(typeStr);
 
             // 2. Создаем объект файла
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
@@ -278,11 +287,14 @@ void NetworkService::parseJson(const QByteArray &data)
 
             QString savedPath = settings.value(Config::filePathKey(file->subjectName(), file->name()), "").toString();
 
-            if (!savedPath.isEmpty()) {
+            if (!savedPath.isEmpty())
+            {
                 // Проверяем, что файл всё еще реально существует на диске
-                if (QFile::exists(savedPath)) {
+                if (QFile::exists(savedPath))
+                {
                     file->setPath(savedPath);
-                } else {
+                } else
+                {
                     // Если пользователь удалил файл руками — чистим настройку
                     settings.remove(Config::filePathKey(file->subjectName(), file->name()));
                 }

@@ -212,7 +212,7 @@ private:
 
 private slots:
     void onDataReady(QList<Subject*> subjects, LessonsMap lessonsMap, DeadlinesMap deadlinesMap);
-
+    void onFileDownloaded(File* file, const QString& savePath);
 
 };
 

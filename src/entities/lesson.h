@@ -68,6 +68,12 @@ public:
      */
     LessonType type() const;
     /**
+     * @brief Возвращает тип урока из строки typeStr (для парсинга)
+     * @param typeStr, константная ссылка на строку с наименованием типа
+     * @return LessonType
+     */
+    static LessonType strToType(const QString &typeStr);
+    /**
      * @brief Устанавливает тип в m_type
      * @param newType, тип урока (LessonType)
      */

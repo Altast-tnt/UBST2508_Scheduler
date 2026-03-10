@@ -104,6 +104,14 @@ void Subject::addDeadline(Deadline *deadline)
     emit deadlinesChanged();
 }
 
+Subject::SubjectType Subject::strToType(const QString &typeStr)
+{
+    if (typeStr == "EXAM") return Subject::EXAM;
+    else if (typeStr == "CREDIT") return Subject::CREDIT;
+    else if (typeStr == "CREDITWITHGRADE") return Subject::CREDITWITHGRADE;
+    else return Subject::MAX_TYPES;
+}
+
 Subject::SubjectType Subject::type() const
 {
     return m_type;

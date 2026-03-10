@@ -104,13 +104,7 @@ BasePopup {
 
             width: popupList.width
             height: Theme.fileCardHeight
-
-            property var fileObj: model.fileObject
-
-            imageSource: fileIcon
-            fName: fileName
-
-            fPath: fileObj ? fileObj.path : ""
+            fileObj: model.fileObject
         }
         visible: count > 0
     }

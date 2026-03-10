@@ -18,6 +18,17 @@ void Deadline::setSubject(Subject *newSubject)
     emit subjectChanged();
 }
 
+Deadline::DeadlineType Deadline::strToType(const QString &typeStr)
+{
+    if (typeStr == "PR") return Deadline::PR;
+    else if (typeStr == "KR") return Deadline::KR;
+    else if (typeStr == "LAB") return Deadline::LAB;
+    else if (typeStr == "PRESENTATION") return Deadline::PRESENTATION;
+    else if (typeStr == "DOKLAD") return Deadline::DOKLAD;
+    else if (typeStr == "REFERAT") return Deadline::REFERAT;
+    else return Deadline::MAX_DEADLINETYPE;
+}
+
 Deadline::DeadlineType Deadline::type() const
 {
     return m_type;

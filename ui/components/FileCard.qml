@@ -20,6 +20,9 @@ import QtQuick.Controls
 */
 Rectangle {
     id: rootFileCard
+
+    property var fileObj: null
+
     implicitHeight: Theme.fileCardHeight
     color: Theme.surface
     radius: 5
@@ -33,13 +36,6 @@ Rectangle {
         opacity: 0.2
     }
 
-    /*! \qmlproperty string FileCard::imageSource Ссылка на иконку (превью) типа файла. */
-    property string imageSource
-    /*! \qmlproperty string FileCard::fName Имя файла для отображения. */
-    property string fName
-    /*! \qmlproperty string FileCard::fPath Путь к файлу или URL для загрузки. */
-    property string fPath
-
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -47,7 +43,7 @@ Rectangle {
 
         // Иконка типа файла
         Image {
-            source: rootFileCard.imageSource
+            source: rootFileCard.fileObj ? rootFileCard.fileObj.icon : ""
 
 
             /*
@@ -61,11 +57,12 @@ Rectangle {
 
         // Блок текстовой информации
         ColumnLayout {
+            Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 2
 
             Text {
-                text: rootFileCard.fName
+                text: rootFileCard.fileObj ? rootFileCard.fileObj.name : ""
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.baseSize
                 color: Theme.textPrimary
@@ -75,8 +72,9 @@ Rectangle {
 
             Text {
                 // Скрываем строку пути, если она пустая
-                visible: rootFileCard.fPath !== ""
-                text: rootFileCard.fPath
+                visible: !!(rootFileCard.fileObj
+                            && rootFileCard.fileObj.path !== "")
+                text: rootFileCard.fileObj ? rootFileCard.fileObj.path : ""
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.baseSize
                 color: Theme.textSecondary
@@ -88,7 +86,8 @@ Rectangle {
         // Кнопка скачивания
         RoundButton {
             Layout.alignment: Qt.AlignVCenter
-            icon.source: rootFileCard.fPath === "" ? "../../assets/icons/download.svg" : "../../assets/icons/openFile.svg"
+            icon.source: (rootFileCard.fileObj
+                          && rootFileCard.fileObj.path === "") ? "../../assets/icons/download.svg" : "../../assets/icons/openFile.svg"
             icon.color: Theme.textPrimary
             icon.width: Theme.downloadBtnSize
             icon.height: Theme.downloadBtnSize
@@ -100,11 +99,14 @@ Rectangle {
             hoverEnabled: true
 
             onClicked: {
-                if (rootFileCard.fPath === "") {
-                    appcore.downloadFile(fileObj)
+                if (!rootFileCard.fileObj)
+                    return
+
+                if (rootFileCard.fileObj.path === "") {
+                    appcore.downloadFile(rootFileCard.fileObj)
                 } else {
                     // Чтобы файл открылся в системной программе (Word, PDF Reader)
-                    Qt.openUrlExternally("file://" + rootFileCard.fPath)
+                    Qt.openUrlExternally("file://" + rootFileCard.fileObj.path)
                 }
             }
         }

@@ -21,12 +21,18 @@ public:
 
     void fetchGoogleSheetsData();
 
+    void downloadFile(const QString& url, const QString& savePath, File* fileObj);
+
 signals:
     void dataReady(QList<Subject*> subjects,
                    LessonsMap lessonsMap,
                    DeadlinesMap deadlinesMap);
 
     void fetchError(QString errorMessage);
+
+    void fileDownloaded(File* fileObj, const QString& savePath);
+
+    void fileDownloadError(const QString& errorMessage);
 
 private:
     QNetworkAccessManager* m_networkManager;

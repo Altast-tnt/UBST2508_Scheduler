@@ -133,6 +133,12 @@ public:
      */
     SubjectType type() const;
     /**
+     * @brief Возвращает тип предмета из строки typeStr (для парсинга)
+     * @param typeStr, константная ссылка на строку с наименованием типа
+     * @return SubjectType
+     */
+    static SubjectType strToType(const QString &typeStr);
+    /**
      * @brief Устанавливает тип в m_type
      * @param newType, тип урока (SubjectType)
      */
