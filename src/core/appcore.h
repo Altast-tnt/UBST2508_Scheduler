@@ -51,8 +51,14 @@ public:
      * @brief Конструктор класса
      * инициализирует:
      * - m_dayListModel
-     * - m_fileModel
+     * - m_deadlinesDayListModel
+     * - m_subjectFileModel
+     * - m_deadlineFileModel
      * - m_subjectDeadlinesModel
+     * - m_netService
+     * Слушатели:
+     * - onDataReady
+     * - onFileDownloaded
      * @param parent указатель на родительский объект QObject
      */
     explicit Appcore(QObject *parent = nullptr);
@@ -61,7 +67,6 @@ public:
      * @brief Загружает данные,
      * вызывая метод fetchGoogleSheetsData() из NetworkService
      */
-
     Q_INVOKABLE void loadFromGoogleSheets();
 
     /**
@@ -162,13 +167,36 @@ public:
      */
     DeadlineListModel* subjectDeadlinesModel() const;
 
+    /**
+     * @brief Возвращает модель дней, установленную в Appcore (m_deadlinesDayListModel)
+     * @return DayListModel*, указатель на объект модели дней
+     */
     DayListModel *deadlinesDayListModel() const;
+    /**
+     * @brief Устанавливает новую модель дней в m_deadlinesDayListModel
+     * @param newDeadlinesDayListModel, указатель на объект модели дней (DayListModel)
+     */
     void setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel);
+
+    /**
+     * @brief Сохраняет состояние IsCompleted в КЭШ через QSettings
+     * @param deadline, указатель на объект дедлайна - Deadline
+     */
     Q_INVOKABLE void saveDeadlineStatus(Deadline* deadline);
+
+    /**
+     * @brief Скачивает файл по методу из NetworkService - downloadFile
+     * если файл не был скачан
+     * @param file, указатель на объект файла - File
+     */
     Q_INVOKABLE void downloadFile(File* file);
+
+    /**
+     * @brief Обновляет файлы в модели файлов предмета (m_subjectFileModel)
+     * проверяя текущее положение (какой текущий предмет и модель файлов этого предмета)
+     * @note Необходимо для того, чтобы в LessonCard корректно отображалась модель файлов
+     */
     Q_INVOKABLE void refreshSubjectFiles();
-
-
 
 signals:
     void currentSubjectChanged();

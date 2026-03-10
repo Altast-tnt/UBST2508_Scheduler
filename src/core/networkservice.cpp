@@ -50,8 +50,6 @@ void NetworkService::downloadFile(const QString &url, const QString &savePath, F
             {
                 f.write(response);
                 f.close();
-
-
                 emit fileDownloaded(fileObj, savePath);
             } else
             {
@@ -67,8 +65,6 @@ void NetworkService::downloadFile(const QString &url, const QString &savePath, F
 
 void NetworkService::parseJson(const QByteArray &data)
 {
-
-
     QJsonDocument doc = QJsonDocument::fromJson(data);
     if (doc.isNull() || !doc.isObject())
     {

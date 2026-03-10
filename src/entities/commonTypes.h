@@ -122,12 +122,15 @@ public:
      * @brief Конструктор класса
      * Инициализирует:
      * - m_name
+     * - m_url
      * - m_path
      * - m_type
+     * - m_subjectName
      * @param name, наименование файла (без типа файла)
      * @param url, ссылка на скачивание файла
      * @param path, полный путь файла после скачивания
      * @param type, тип файла из перечисления FileType
+     * @param subjectName, наименование предмета, к которому относится файл
      * @param parent, указатель на родительский объект QObject
      */
     File(QString name, QString url, QString path, FileType type, QString subjectName, QObject *parent = nullptr)
