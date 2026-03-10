@@ -58,6 +58,8 @@ qt_add_qml_module(appUBST2508_Sheduler
         src/models/daylistmodel.h src/models/daylistmodel.cpp
         src/models/deadlinelistmodel.h src/models/deadlinelistmodel.cpp
         src/models/filelistmodel.h src/models/filelistmodel.cpp
+        SOURCES src/core/constants.h
+        SOURCES src/core/networkservice.h src/core/networkservice.cpp
 
 )
 

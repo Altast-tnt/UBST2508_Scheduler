@@ -130,8 +130,8 @@ public:
      * @param type, тип файла из перечисления FileType
      * @param parent, указатель на родительский объект QObject
      */
-    File(QString name, QString url, QString path, FileType type, QObject *parent = nullptr)
-        : QObject(parent), m_name(name), m_url(url), m_path(path), m_type(type)
+    File(QString name, QString url, QString path, FileType type, QString subjectName, QObject *parent = nullptr)
+        : QObject(parent), m_name(name), m_url(url), m_path(path), m_type(type), m_subjectName(subjectName)
     {}
 
     /**

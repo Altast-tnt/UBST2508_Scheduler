@@ -1,6 +1,7 @@
 #include "appcore.h"
 #include "src/entities/day.h"
 #include "src/entities/commonTypes.h"
+#include "constants.h"
 
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -33,12 +34,12 @@ void Appcore::loadTestData()
     historyTeacher->setName("Лаврова Ирина Анатольевна");
     historyTeacher->setEmail("iralavrova@mail.com");
 
-    File* presHistory = new File("Лекция 1", "", "../../lect1.pptx", File::PPTX, this);
+    //File* presHistory = new File("Лекция 1", "", "../../lect1.pptx", File::PPTX, this);
 
     Subject* history = new Subject(this);
     history->setName("История России");
     history->addTeacher(historyTeacher);
-    history->addFile(presHistory);
+    //history->addFile(presHistory);
     m_subjects.append(history);
 
     Subject* prog = new Subject(this);
@@ -99,14 +100,14 @@ void Appcore::loadTestData()
             deadlineListDay.append(d1);
 
 
-            File* labTask = new File("Задание на лабу", "", "../../lab1.pdf", File::PDF, this);
+            //File* labTask = new File("Задание на лабу", "", "../../lab1.pdf", File::PDF,  this);
 
             Deadline* d2 = new Deadline(day);
             d2->setSubject(history);
             d2->setType(Deadline::KR);
             d2->setDateTime(QDateTime(currentDate, QTime(23, 59)));
             d2->setIsCompleted(true);
-            d2->addFile(labTask);
+            //d2->addFile(labTask);
             d2->setDescription(R"(Из прикрепленного файла взять по вариантам задание и подготовить реферат, правила оформления:
 • 14 пт Times New Roman
 • не менее 10 страниц А4
@@ -115,14 +116,14 @@ void Appcore::loadTestData()
             history->addDeadline(d2);
             deadlineListDay.append(d2);
 
-            File* labTask2 = new File("Задание на лабу222", "", "../../lab2.pdf", File::PDF, this);
+            //File* labTask2 = new File("Задание на лабу222", "", "../../lab2.pdf", File::PDF, this);
 
             Deadline* d4 = new Deadline(day);
             d4->setSubject(history);
             d4->setType(Deadline::LAB);
             d4->setDateTime(QDateTime(currentDate, QTime(12, 59)));
             d4->setIsCompleted(false);
-            d4->addFile(labTask2);
+            //d4->addFile(labTask2);
             d4->setDescription(R"(Из прикрепленного файла взять по вариантам задание и подготовить реферат, правила оформления:
 Прикрепить готовую работу в ЛМС)");
             history->addDeadline(d4);
@@ -172,7 +173,7 @@ void Appcore::loadTestData()
 
 void Appcore::loadFromGoogleSheets()
 {
-    QNetworkRequest request(QUrl("https://script.google.com/macros/s/AKfycbwwO9mYGbUwU23IKdULjzhoP8p9aitswx0oofqHTzYClhhmgJFb5M3i3ZW6RP0cF8nu/exec"));
+    QNetworkRequest request((QUrl(Config::GoogleScriptUrl)));
     QNetworkReply* reply = m_networkManager->get(request);
 
     connect(reply, &QNetworkReply::finished, this, [=]() {
@@ -327,8 +328,8 @@ void Appcore::setDeadlinesDayListModel(DayListModel *newDeadlinesDayListModel)
 
 void Appcore::saveDeadlineStatus(Deadline *deadline)
 {
-    QSettings settings("MyUniversityApp", "Scheduler");
-    QString key = "deadline_" + deadline->dateTime().toString() + "_" + deadline->description();
+    QSettings settings(Config::OrgName, Config::AppName);
+    QString key = Config::deadlineStatusKey(deadline->dateTime().toString(), deadline->description());
     settings.setValue(key, deadline->isCompleted());
 }
 
@@ -359,8 +360,8 @@ void Appcore::downloadFile(File *file)
 
                 // Обновляем объект и сохраняем путь
                 file->setPath(savePath);
-                QSettings settings("MyUniversityApp", "Scheduler");
-                settings.setValue("file_path_" + file->subjectName() + "_" + file->name(), savePath);
+                QSettings settings(Config::OrgName, Config::AppName);
+                settings.setValue(Config::filePathKey(file->subjectName(), file->name()), savePath);
 
                 for (Subject* subj : std::as_const(m_subjects))
                 {
@@ -412,7 +413,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
 
     QJsonObject rootObj = doc.object();
 
-    QSettings settings("MyUniversityApp", "Scheduler");
+    QSettings settings(Config::OrgName, Config::AppName);
 
     setCurrentSubject(nullptr);
     setCurrentDeadline(nullptr);
@@ -488,9 +489,9 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
 
             // 2. Создаем объект файла
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
-            File *file = new File(fileName, fileUrl, "", fType,  subj);
+            File *file = new File(fileName, fileUrl, "", fType, subjectName, subj);
 
-            QString savedPath = settings.value("file_path_" + file->subjectName() + "_" + file->name(), "").toString();
+            QString savedPath = settings.value(Config::filePathKey(file->subjectName(), file->name()), "").toString();
 
             if (!savedPath.isEmpty()) {
                 // Проверяем, что файл всё еще реально существует на диске
@@ -498,7 +499,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
                     file->setPath(savedPath);
                 } else {
                     // Если пользователь удалил файл руками — чистим настройку
-                    settings.remove("file_path_" + file->subjectName() + "_" + file->name());
+                    settings.remove(Config::filePathKey(file->subjectName(), file->name()));
                 }
             }
 
@@ -629,7 +630,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
         deadline->setIsCompleted(false);
 
 
-        QString key = "deadline_" + deadline->dateTime().toString() + "_" + deadline->description();
+        QString key = Config::deadlineStatusKey(deadline->dateTime().toString(), deadline->description());
         deadline->setIsCompleted(settings.value(key, false).toBool());
 
 
@@ -652,9 +653,9 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
 
             // 2. Создаем объект файла
             // Путь (path) пока оставляем пустым, так как файл еще не на диске
-            File *file = new File(fileName, fileUrl, "", fType, deadline);
+            File *file = new File(fileName, fileUrl, "", fType, subjectName, deadline);
 
-            QString savedPath = settings.value("file_path_" + file->subjectName() + "_" + file->name(), "").toString();
+            QString savedPath = settings.value(Config::filePathKey(file->subjectName(), file->name()), "").toString();
 
             if (!savedPath.isEmpty()) {
                 // Проверяем, что файл всё еще реально существует на диске
@@ -662,7 +663,7 @@ void Appcore::parseAndApplyJson(const QByteArray &data)
                     file->setPath(savedPath);
                 } else {
                     // Если пользователь удалил файл руками — чистим настройку
-                    settings.remove("file_path_" + file->subjectName() + "_" + file->name());
+                    settings.remove(Config::filePathKey(file->subjectName(), file->name()));
                 }
             }
 
