@@ -17,6 +17,9 @@ Appcore::Appcore(QObject *parent)
     m_subjectDeadlinesModel = new DeadlineListModel(this);
 
     m_netService = new NetworkService(this);
+    connect(m_netService, &NetworkService::loadingStarted, this, [this](){setIsLoading(true);});
+
+    connect(m_netService, &NetworkService::loadingFinished, this, [this](){setIsLoading(false);});
     connect(m_netService, &NetworkService::dataReady, this, &Appcore::onDataReady);
     connect(m_netService, &NetworkService::fileDownloaded, this, &Appcore::onFileDownloaded);
     connect(m_netService, &NetworkService::errorOccurred, this, &Appcore::showNotification);
@@ -366,4 +369,16 @@ void Appcore::onDataReady(QList<Subject *> subjects, QMap<QDate, QList<Lesson *>
 
         m_deadlinesDayListModel->addDay(deadlineDay);
     }
+}
+
+bool Appcore::isLoading() const
+{
+    return m_isLoading;
+}
+
+void Appcore::setIsLoading(bool loading)
+{
+    if (m_isLoading == loading) return;
+    m_isLoading = loading;
+    emit isLoadingChanged();
 }

@@ -46,6 +46,11 @@ class Appcore : public QObject
     Q_PROPERTY(FileListModel* deadlineFileModel READ deadlineFileModel WRITE setDeadlineFileModel NOTIFY deadlineFileModelChanged FINAL)
     Q_PROPERTY(DeadlineListModel* subjectDeadlinesModel READ subjectDeadlinesModel CONSTANT)
 
+    /**
+     * @brief Индикатор загрузки данных из БД
+     */
+    Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged FINAL)
+
 public:
     /**
      * @brief Конструктор класса
@@ -60,6 +65,8 @@ public:
      * - onDataReady
      * - onFileDownloaded
      * - showNotification
+     * - onFileDownloadFailed
+     * - setIsLoading
      * @param parent указатель на родительский объект QObject
      */
     explicit Appcore(QObject *parent = nullptr);
@@ -211,6 +218,12 @@ public:
      */
     Q_INVOKABLE void refreshSubjectFiles();
 
+    /**
+     * @brief Передает значение индикатора загрузки - m_isLoading
+     * @return bool
+     */
+    bool isLoading() const;
+
 signals:
     void currentSubjectChanged();
     void currentDeadlineChanged();
@@ -231,6 +244,8 @@ signals:
 
     void showNotification(QString message);
 
+    void isLoadingChanged();
+
 private:
     Subject *m_currentSubject = nullptr;
     Deadline *m_currentDeadline = nullptr;
@@ -245,6 +260,14 @@ private:
     DeadlineListModel *m_subjectDeadlinesModel = nullptr;
 
     NetworkService* m_netService = nullptr;
+
+    bool m_isLoading;
+
+    /**
+     * @brief Устанавливает значение индикатора загрузки - m_isLoading
+     * @param loading, булево значение индикатора
+     */
+    void setIsLoading(bool loading);
 
 private slots:
     void onDataReady(QList<Subject*> subjects, LessonsMap lessonsMap, DeadlinesMap deadlinesMap);

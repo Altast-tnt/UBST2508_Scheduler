@@ -68,6 +68,10 @@ signals:
 
     void fileDownloadError(const QString& errorMessage);
 
+    void loadingStarted();
+
+    void loadingFinished();
+
     void errorOccurred(QString message);
 
     void fileDownloadFailed(File* fileObj);
@@ -131,7 +135,6 @@ private:
      * @return QString
      */
     QString getCacheFilePath() const;
-
 };
 
 #endif // NETWORKSERVICE_H

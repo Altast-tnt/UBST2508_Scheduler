@@ -169,6 +169,33 @@ Window {
         }
     }
 
+    Rectangle {
+        id: loadingOverlay
+        anchors.fill: parent
+        color: Theme.background
+        opacity: 0.8
+        z: 100
+
+        visible: appcore.isLoading
+
+        // Блокируем MouseArea, чтобы нельзя было тыкать в кнопки под ним
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+
+                /* игнорируем клики */ }
+        }
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: appcore.isLoading
+
+            palette.highlight: Theme.accentBlue
+            palette.dark: Theme.accentBlue
+            palette.text: Theme.accentBlue
+        }
+    }
+
     // --- Глобальные всплывающие окна ---
 
 

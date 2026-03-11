@@ -21,6 +21,8 @@ NetworkService::NetworkService(QObject *parent)
 
 void NetworkService::fetchGoogleSheetsData()
 {
+    emit loadingStarted();
+
     QNetworkRequest request((QUrl(Config::GoogleScriptUrl)));
     QNetworkReply* reply = m_networkManager->get(request);
 
@@ -45,6 +47,7 @@ void NetworkService::fetchGoogleSheetsData()
             qWarning() << "Ошибка сети:" << reply->errorString();
             emit errorOccurred("Нет сети. Показано сохраненное расписание.");
         }
+        emit loadingFinished();
         reply->deleteLater();
     });
 }
