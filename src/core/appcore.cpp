@@ -19,10 +19,12 @@ Appcore::Appcore(QObject *parent)
     m_netService = new NetworkService(this);
     connect(m_netService, &NetworkService::dataReady, this, &Appcore::onDataReady);
     connect(m_netService, &NetworkService::fileDownloaded, this, &Appcore::onFileDownloaded);
+    connect(m_netService, &NetworkService::errorOccurred, this, &Appcore::showNotification);
 }
 
 void Appcore::loadFromGoogleSheets()
 {
+    m_netService->loadFromCache();
     m_netService->fetchGoogleSheetsData();
 }
 

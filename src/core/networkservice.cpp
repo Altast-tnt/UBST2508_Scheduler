@@ -10,6 +10,8 @@
 #include <QJsonObject>
 #include <QNetworkReply>
 #include <QSettings>
+#include <QStandardPaths>
+#include <QDir>
 
 NetworkService::NetworkService(QObject *parent)
     : QObject{parent}
@@ -26,7 +28,22 @@ void NetworkService::fetchGoogleSheetsData()
         if (reply->error() == QNetworkReply::NoError)
         {
             QByteArray response = reply->readAll();
+
+            QString filePath = getCacheFilePath();
+            QFile file(filePath);
+
+            if (file.open(QIODevice::WriteOnly))
+            {
+                file.write(response);
+                file.close();
+                qDebug() << "Новые данные сохранены в кэш!";
+            }
+
             parseJson(response);
+        } else
+        {
+            qWarning() << "Ошибка сети:" << reply->errorString();
+            emit errorOccurred("Нет сети. Показано сохраненное расписание.");
         }
         reply->deleteLater();
     });
@@ -58,6 +75,7 @@ void NetworkService::downloadFile(const QString &url, const QString &savePath, F
         } else
         {
             emit fetchError("Ошибка загрузки файла: " + reply->errorString());
+            emit errorOccurred("Ошибка загрузки файла. Проверьте интернет.");
         }
         reply->deleteLater();
     });
@@ -235,4 +253,37 @@ DeadlinesMap NetworkService::parseDeadlines(const QJsonArray &deadlinesArray, co
         deadlinesMap[dDate].append(deadline);
     }
     return deadlinesMap;
+}
+
+
+QString NetworkService::getCacheFilePath() const
+{
+    // Получаем путь к системной папке данных приложения
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir(dataPath);
+
+    // Если папки еще нет (первый запуск) - создаем её
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    // Возвращаем полный путь к нашему файлу-кэшу
+    return dataPath + "/cached_schedule.json";
+}
+
+void NetworkService::loadFromCache()
+{
+    QString filePath = getCacheFilePath();
+    QFile file(filePath);
+
+    if (file.exists() && file.open(QIODevice::ReadOnly)) {
+        QByteArray cachedData = file.readAll();
+        file.close();
+
+        // Парсим и отправляем сигнал dataReady
+        parseJson(cachedData);
+        qDebug() << "Данные загружены из локального кэша!";
+    } else {
+        qDebug() << "Кэш пуст или не найден.";
+    }
 }

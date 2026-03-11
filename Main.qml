@@ -136,6 +136,68 @@ Window {
         }
     }
 
+    Connections {
+        target: appcore
+        function onShowNotification(message) {
+            toastText.text = message
+            toastPopup.open()
+            toastTimer.restart()
+        }
+    }
+
+    // Всплывающее уведомление (если ошибка сети)
+    Popup {
+        id: toastPopup
+        anchors.centerIn: parent
+
+        // Убираем фокус и модальность, чтобы не мешать пользователю кликать
+        modal: false
+        focus: false
+        closePolicy: Popup.NoAutoClose
+
+        background: Rectangle {
+            color: Theme.surface
+            radius: 10
+            border.color: Theme.accentRed
+            border.width: 1
+        }
+
+        Text {
+            id: toastText
+            anchors.centerIn: parent
+            padding: 10
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.baseSize
+            color: Theme.textPrimary
+        }
+
+        // Таймер для автозакрытия через 3 секунды
+        Timer {
+            id: toastTimer
+            interval: 3000
+            repeat: false
+            onTriggered: toastPopup.close()
+        }
+
+        // Анимация появления
+        enter: Transition {
+            NumberAnimation {
+                property: "opacity"
+                from: 0.0
+                to: 1.0
+                duration: 300
+            }
+        }
+        exit: Transition {
+            NumberAnimation {
+                property: "opacity"
+                from: 1.0
+                to: 0.0
+                duration: 300
+            }
+        }
+    }
+
     // --- Глобальные всплывающие окна ---
 
 

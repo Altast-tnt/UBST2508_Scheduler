@@ -59,13 +59,14 @@ public:
      * Слушатели:
      * - onDataReady
      * - onFileDownloaded
+     * - showNotification
      * @param parent указатель на родительский объект QObject
      */
     explicit Appcore(QObject *parent = nullptr);
 
     /**
      * @brief Загружает данные,
-     * вызывая метод fetchGoogleSheetsData() из NetworkService
+     * вызывая методы loadFromCache(), fetchGoogleSheetsData() из NetworkService
      */
     Q_INVOKABLE void loadFromGoogleSheets();
 
@@ -215,6 +216,8 @@ signals:
     void subjectFileModelChanged();
 
     void deadlineFileModelChanged();
+
+    void showNotification(QString message);
 
 private:
     Subject *m_currentSubject = nullptr;

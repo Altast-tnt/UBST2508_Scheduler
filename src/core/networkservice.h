@@ -43,6 +43,13 @@ public:
      */
     void downloadFile(const QString& url, const QString& savePath, File* fileObj);
 
+    /**
+     * @brief Загрузка данных из КЭШа
+     * использует getCacheFilePath() для нахождения/создания папки КЭШа
+     * Если есть json файл с данными - парсинг через parseJson
+     */
+    void loadFromCache();
+
 signals:
     void dataReady(QList<Subject*> subjects,
                    LessonsMap lessonsMap,
@@ -53,6 +60,9 @@ signals:
     void fileDownloaded(File* fileObj, const QString& savePath);
 
     void fileDownloadError(const QString& errorMessage);
+
+    void errorOccurred(QString message);
+
 
 private:
     QNetworkAccessManager* m_networkManager;
@@ -105,6 +115,14 @@ private:
      * @return QMap<QDate, QList<Deadline*>> (DeadlinesMap)
      */
     DeadlinesMap parseDeadlines(const QJsonArray& deadlinesArray, const QJsonObject& allFilesMap, const QList<Subject*>& subjects);
+
+    /**
+     * @brief Получение пути к папке с кэшированными данными
+     * (весь JSON полученный ранее)
+     * @return QString
+     */
+    QString getCacheFilePath() const;
+
 };
 
 #endif // NETWORKSERVICE_H
