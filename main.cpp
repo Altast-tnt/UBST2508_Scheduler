@@ -21,8 +21,7 @@ int main(int argc, char *argv[])
     Appcore appcore;
     QQmlApplicationEngine engine;
 
-    //appcore.loadTestData();
-    appcore.loadFromGoogleSheets();
+    appcore.initData();
 
     engine.rootContext()->setContextProperty("appcore", &appcore);
 

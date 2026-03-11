@@ -68,7 +68,19 @@ public:
      * @brief Загружает данные,
      * вызывая методы loadFromCache(), fetchGoogleSheetsData() из NetworkService
      */
-    Q_INVOKABLE void loadFromGoogleSheets();
+    Q_INVOKABLE void initData();
+
+    /**
+     * @brief Обновляет данные,
+     * вызывая метод fetchGoogleSheetsData() из NetworkService
+     */
+    Q_INVOKABLE void refreshDataFromNetwork();
+
+    /**
+     * @brief Очищает КЭШ,
+     * вызывая метод clearCache() из NetworkService
+     */
+    Q_INVOKABLE void clearCache();
 
     /**
      * @brief Возвращает текущий предмет, установленный в Appcore (m_currentSubject)

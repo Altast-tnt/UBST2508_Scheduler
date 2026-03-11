@@ -22,10 +22,50 @@ Appcore::Appcore(QObject *parent)
     connect(m_netService, &NetworkService::errorOccurred, this, &Appcore::showNotification);
 }
 
-void Appcore::loadFromGoogleSheets()
+void Appcore::initData()
 {
+    // Сначала грузим из файла
     m_netService->loadFromCache();
+
+    // В фоне стучимся за новыми данными
     m_netService->fetchGoogleSheetsData();
+}
+
+void Appcore::refreshDataFromNetwork()
+{
+    // Пользователь нажал кнопку. Кэш не трогаем.
+    emit showNotification("Обновление данных...");
+    m_netService->fetchGoogleSheetsData();
+}
+
+void Appcore::clearCache()
+{
+    // Удаляем локальный JSON файл
+    m_netService->clearLocalCache();
+
+    // Сбрасываем все галочки и пути файлов в системном реестре
+    QSettings settings(Config::OrgName, Config::AppName);
+    settings.clear();
+
+    // Очищаем интерфейс и оперативную память
+    setCurrentSubject(nullptr);
+    setCurrentDeadline(nullptr);
+
+    m_dayListModel->clear();
+    m_deadlinesDayListModel->clear();
+
+    if (m_subjectFileModel) m_subjectFileModel->setFiles({});
+    if (m_deadlineFileModel) m_deadlineFileModel->setFiles({});
+    if (m_subjectDeadlinesModel) m_subjectDeadlinesModel->setDeadlines({});
+
+    qDeleteAll(m_subjects);
+    m_subjects.clear();
+
+    // Сигнал, чтобы списки обновились (стали пустыми)
+    emit subjectsChanged();
+
+    // Показываем красивое уведомление (Toast)
+    emit showNotification("Кэш и данные успешно очищены");
 }
 
 Subject *Appcore::currentSubject() const

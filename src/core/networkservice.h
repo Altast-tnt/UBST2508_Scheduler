@@ -50,6 +50,13 @@ public:
      */
     void loadFromCache();
 
+    /**
+     * @brief Очистка данных из КЭШа
+     * использует getCacheFilePath() для нахождения папки КЭШа
+     * если есть файл - удаляем
+     */
+    void clearLocalCache();
+
 signals:
     void dataReady(QList<Subject*> subjects,
                    LessonsMap lessonsMap,

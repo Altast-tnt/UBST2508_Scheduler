@@ -60,24 +60,11 @@ Window {
             Layout.fillHeight: false
 
             // Кнопка настроек
-            RoundButton {
+            HeaderButton {
                 id: btSettings
 
-                background: Rectangle {
-                    radius: parent.radius
-                    color: "transparent"
-                    border.width: 1
-                    border.color: Theme.textSecondary
-                }
-
-                radius: 100
-                Layout.preferredWidth: Theme.headerButtonSize
-                Layout.preferredHeight: Theme.headerButtonSize
-
-                icon.source: "assets/icons/settings.svg"
-                icon.color: Theme.textPrimary
-                icon.width: Theme.headerButtonSize * 0.5
-                icon.height: Theme.headerButtonSize * 0.5
+                iconSource: "assets/icons/settings.svg"
+                onClicked: globalSettingsPopup.open()
             }
 
             // Распорка
@@ -98,26 +85,10 @@ Window {
             }
 
             // Кнопка смены темы (День/Ночь)
-            RoundButton {
+            HeaderButton {
                 id: btChangeTheme
 
-                hoverEnabled: true
-                background: Rectangle {
-                    radius: parent.radius
-                    color: btChangeTheme.hovered ? Theme.accentBlue : "transparent"
-                    border.width: 1
-                    border.color: Theme.textSecondary
-                }
-
-                radius: 100
-                Layout.preferredWidth: Theme.headerButtonSize
-                Layout.preferredHeight: Theme.headerButtonSize
-
-                icon.source: "assets/icons/changeTheme.svg"
-                icon.color: Theme.textPrimary
-                icon.width: Theme.headerButtonSize * 0.5
-                icon.height: Theme.headerButtonSize * 0.5
-
+                iconSource: "assets/icons/changeTheme.svg"
                 onClicked: {
                     Theme.isDark = !Theme.isDark
                 }
@@ -219,5 +190,10 @@ Window {
     /*! Глобальное окно списка дедлайнов по конкретному предмету */
     SubjectDeadlinesPopup {
         id: globalSubjectDeadlinesPopup
+    }
+
+    /*! Глобальное окно списка настроек */
+    SettingsPopup {
+        id: globalSettingsPopup
     }
 }

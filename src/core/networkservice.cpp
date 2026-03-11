@@ -287,3 +287,20 @@ void NetworkService::loadFromCache()
         qDebug() << "Кэш пуст или не найден.";
     }
 }
+
+void NetworkService::clearLocalCache()
+{
+    QString filePath = getCacheFilePath();
+    QFile file(filePath);
+
+    if (file.exists())
+    {
+        if (file.remove())
+        {
+            qDebug() << "Файл кэша успешно удален.";
+        } else
+        {
+            qWarning() << "Не удалось удалить файл кэша.";
+        }
+    }
+}
