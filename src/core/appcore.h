@@ -218,6 +218,13 @@ public:
      */
     Q_INVOKABLE void refreshSubjectFiles();
 
+
+    /**
+     * @brief Сохраняет текст в буфер обмена
+     * @param text, константная ссылка на строку с текстом
+     */
+    Q_INVOKABLE void copyToClipboard(const QString &text);
+
     /**
      * @brief Передает значение индикатора загрузки - m_isLoading
      * @return bool

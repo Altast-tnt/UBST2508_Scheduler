@@ -38,6 +38,7 @@ BasePopup {
         }
 
         Text {
+            id: emailText
             /*! \internal Логика извлечения email первого преподавателя из списка предмета */
             property var teacher: (appcore.currentSubject
                                    && appcore.currentSubject.teachers.length
@@ -46,6 +47,24 @@ BasePopup {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.baseSize
             color: Theme.accentBlue
+            opacity: emailMouseArea.containsMouse ? 0.7 : 1.0
+
+            MouseArea {
+                id: emailMouseArea
+                hoverEnabled: true
+                anchors.fill: parent
+                cursorShape: (emailText.teacher) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onClicked: {
+                    if (emailText.teacher) {
+                        // Копируем
+                        appcore.copyToClipboard(emailText.teacher.email)
+
+                        // Пытаемся открыть почту
+                        Qt.openUrlExternally(
+                                    "mailto:" + emailText.teacher.email)
+                    }
+                }
+            }
         }
     }
 

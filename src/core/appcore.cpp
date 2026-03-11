@@ -5,7 +5,9 @@
 
 #include <QFile>
 #include <QFileDialog>
+#include <QGuiApplication>
 #include <QSettings>
+#include <QClipboard>
 
 Appcore::Appcore(QObject *parent)
     : QObject{parent}
@@ -252,6 +254,12 @@ void Appcore::refreshSubjectFiles()
     {
         m_subjectFileModel->setFiles(m_currentSubject->files());
     }
+}
+
+void Appcore::copyToClipboard(const QString &text)
+{
+    QGuiApplication::clipboard()->setText(text);
+    emit showNotification("Email скопирован в буфер обмена");
 }
 
 void Appcore::onFileDownloaded(File *file, const QString &savePath)

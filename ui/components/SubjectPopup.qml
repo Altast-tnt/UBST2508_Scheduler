@@ -57,6 +57,24 @@ BasePopup {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.baseSize
             color: Theme.accentBlue
+            opacity: emailMouseArea.containsMouse ? 0.7 : 1.0
+
+            MouseArea {
+                id: emailMouseArea
+                hoverEnabled: true
+                anchors.fill: parent
+                cursorShape: (headerText.teacher) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onClicked: {
+                    if (headerText.teacher) {
+                        // Копируем
+                        appcore.copyToClipboard(headerText.teacher.email)
+
+                        // Пытаемся открыть почту
+                        Qt.openUrlExternally(
+                                    "mailto:" + headerText.teacher.email)
+                    }
+                }
+            }
         }
     }
 
