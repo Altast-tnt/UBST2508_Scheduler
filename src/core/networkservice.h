@@ -70,6 +70,8 @@ signals:
 
     void errorOccurred(QString message);
 
+    void fileDownloadFailed(File* fileObj);
+
 
 private:
     QNetworkAccessManager* m_networkManager;

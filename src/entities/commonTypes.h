@@ -159,6 +159,10 @@ public:
      * @brief Тип файла (перечисление FileType)
      */
     Q_PROPERTY(FileType type READ type NOTIFY typeChanged FINAL)
+    /**
+     * @brief Индикатор загрузки файла
+     */
+    Q_PROPERTY(bool isDownloading READ isDownloading WRITE setIsDownloading NOTIFY isDownloadingChanged FINAL)
 
     /**
      * @brief Возвращает наименование файла, установленное в m_name
@@ -227,12 +231,16 @@ public:
     void setSubjectName(const QString &newSubjectName);
 
 
+    bool isDownloading() const;
+    void setIsDownloading(bool newIsDownloading);
+
 private:
     QString m_name;
     QString m_path = "";
     FileType m_type = MAX_TYPES;
     QString m_url = "";
     QString m_subjectName;
+    bool m_isDownloading = false;
 
 signals:
     void nameChanged();
@@ -241,7 +249,21 @@ signals:
     void typeChanged();
     void urlChanged();
     void subjectNameChanged();
+    void isDownloadingChanged();
 };
+
+inline bool File::isDownloading() const
+{
+    return m_isDownloading;
+}
+
+inline void File::setIsDownloading(bool newIsDownloading)
+{
+    if (m_isDownloading == newIsDownloading)
+        return;
+    m_isDownloading = newIsDownloading;
+    emit isDownloadingChanged();
+}
 
 inline QString File::url() const
 {

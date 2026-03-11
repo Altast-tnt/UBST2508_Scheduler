@@ -24,7 +24,8 @@ public:
         FileNameRole = Qt::UserRole + 1,
         FilePathRole,
         FileIconRole,
-        FileObjectRole
+        FileObjectRole,
+        FileIsDownloadingRole
     };
 
     /**

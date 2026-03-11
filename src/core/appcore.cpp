@@ -20,6 +20,7 @@ Appcore::Appcore(QObject *parent)
     connect(m_netService, &NetworkService::dataReady, this, &Appcore::onDataReady);
     connect(m_netService, &NetworkService::fileDownloaded, this, &Appcore::onFileDownloaded);
     connect(m_netService, &NetworkService::errorOccurred, this, &Appcore::showNotification);
+    connect(m_netService, &NetworkService::fileDownloadFailed, this, &Appcore::onFileDownloadFailed);
 }
 
 void Appcore::initData()
@@ -235,6 +236,9 @@ void Appcore::downloadFile(File *file)
     QString savePath = QFileDialog::getSaveFileName(nullptr, "Сохранить файл", file->name());
     if (savePath.isEmpty()) return; // Пользователь нажал "Отмена"
 
+    // Индикатор загрузки
+    file->setIsDownloading(true);
+
     // Даем команду (Сеть)
     m_netService->downloadFile(file->url(), savePath, file);
 }
@@ -250,6 +254,9 @@ void Appcore::refreshSubjectFiles()
 void Appcore::onFileDownloaded(File *file, const QString &savePath)
 {
     if (!file) return;
+
+    // Загрузка завершена - отключаем индикатор
+    file->setIsDownloading(false);
 
     // Обновляем объект
     file->setPath(savePath);
@@ -280,6 +287,13 @@ void Appcore::onFileDownloaded(File *file, const QString &savePath)
                 }
             }
         }
+    }
+}
+
+void Appcore::onFileDownloadFailed(File *file)
+{
+    if (file) {
+        file->setIsDownloading(false);
     }
 }
 

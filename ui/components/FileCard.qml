@@ -41,6 +41,21 @@ Rectangle {
         anchors.margins: 10
         spacing: 15
 
+        // Анимация загрузки (крутилка)
+        BusyIndicator {
+            property bool isLoading: rootFileCard.fileObj ? rootFileCard.fileObj.isDownloading : false
+
+            palette.dark: Theme.textPrimary // Для стиля Basic
+            palette.highlight: Theme.textPrimary // Для стиля Fusion / Windows
+            palette.text: Theme.textPrimary // Для некоторых других стилей
+
+            Layout.fillWidth: true
+            height: Theme.downloadBtnSize
+            width: Theme.downloadBtnSize
+            running: isLoading
+            visible: isLoading
+        }
+
         // Иконка типа файла
         Image {
             source: rootFileCard.fileObj ? rootFileCard.fileObj.icon : ""
@@ -97,6 +112,11 @@ Rectangle {
 
             opacity: hovered ? 0.7 : 1.0
             hoverEnabled: true
+
+            property bool isLoading: rootFileCard.fileObj ? rootFileCard.fileObj.isDownloading : false
+
+            // Прячем кнопку, пока идет загрузка
+            visible: !isLoading
 
             onClicked: {
                 if (!rootFileCard.fileObj)

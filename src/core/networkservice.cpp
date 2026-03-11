@@ -71,11 +71,13 @@ void NetworkService::downloadFile(const QString &url, const QString &savePath, F
             } else
             {
                 emit fetchError("Не удалось открыть файл для записи");
+                emit fileDownloadFailed(fileObj);
             }
         } else
         {
             emit fetchError("Ошибка загрузки файла: " + reply->errorString());
             emit errorOccurred("Ошибка загрузки файла. Проверьте интернет.");
+            emit fileDownloadFailed(fileObj);
         }
         reply->deleteLater();
     });
