@@ -231,7 +231,7 @@ ColumnLayout {
             spacing: 10
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
+            // TODO: Не растягивать картинку, а менять ее фикс размер относительно ширины
             AnimatedImage {
                 source: "../../assets/images/noDeadline.gif"
                 Layout.fillWidth: true

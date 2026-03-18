@@ -231,6 +231,7 @@ public:
      */
     bool isLoading() const;
 
+
 signals:
     void currentSubjectChanged();
     void currentDeadlineChanged();

@@ -126,7 +126,10 @@ Rectangle {
                     appcore.downloadFile(rootFileCard.fileObj)
                 } else {
                     // Чтобы файл открылся в системной программе (Word, PDF Reader)
-                    Qt.openUrlExternally("file://" + rootFileCard.fileObj.path)
+                    // TODO: Проверить на пк, так как было изменено для Андроид
+                    Qt.openUrlExternally(
+                                Qt.resolvedUrl(
+                                    "file:///" + rootFileCard.fileObj.path))
                 }
             }
         }
