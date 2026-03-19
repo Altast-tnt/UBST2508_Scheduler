@@ -10,7 +10,7 @@ RoundButton {
     hoverEnabled: true
     background: Rectangle {
         radius: parent.radius
-        color: rootBt.hovered ? Theme.accentBlue : "transparent"
+        color: rootBt.down ? Theme.accentBlue : (rootBt.hovered ? Theme.accentBlue : "transparent")
         border.width: 1
         border.color: Theme.textSecondary
     }

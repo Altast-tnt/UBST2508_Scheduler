@@ -24,11 +24,6 @@ Rectangle {
     radius: Theme.segmentedToggleRadius
     color: "transparent"
 
-
-    /*
-       TODO: Протестировать адаптивность границ и текста на экранах с высоким DPI.
-       Возможно, стоит заменить border.width на значение из Theme.
-    */
     border.color: Theme.accentBlue
     border.width: 1
 

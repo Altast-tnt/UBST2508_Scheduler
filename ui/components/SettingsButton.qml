@@ -6,17 +6,29 @@ RoundButton {
     id: rootBt
 
     property string buttonText: ""
+
     text: buttonText
-    palette.buttonText: Theme.textPrimary
-    font.pixelSize: Theme.baseSize
-    font.family: Theme.fontFamily
+
     Layout.fillWidth: true
     radius: 20
 
     hoverEnabled: true
+
+    contentItem: Text {
+        text: rootBt.text
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.baseSize
+
+        color: Theme.textPrimary
+
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+    }
+
     background: Rectangle {
         radius: parent.radius
-        color: rootBt.hovered ? Theme.accentBlue : Theme.surface
+        color: rootBt.down ? Theme.accentBlue : (rootBt.hovered ? Theme.accentBlue : Theme.surface)
         border.width: 1
         border.color: Theme.accentBlue
     }

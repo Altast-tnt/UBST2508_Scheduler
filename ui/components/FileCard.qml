@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Controls.Material
+import Qt5Compat.GraphicalEffects
 
 
 /*!
@@ -23,9 +25,10 @@ Rectangle {
 
     property var fileObj: null
 
-    implicitHeight: Theme.fileCardHeight
+    Layout.fillWidth: true
     color: Theme.surface
     radius: 5
+    implicitHeight: rowLayout.implicitHeight + 20
 
     /*! \internal Тонкая разделительная линия в нижней части карточки */
     Rectangle {
@@ -37,43 +40,26 @@ Rectangle {
     }
 
     RowLayout {
-        anchors.fill: parent
-        anchors.margins: 10
-        spacing: 15
-
-        // Анимация загрузки (крутилка)
-        BusyIndicator {
-            property bool isLoading: rootFileCard.fileObj ? rootFileCard.fileObj.isDownloading : false
-
-            palette.dark: Theme.textPrimary // Для стиля Basic
-            palette.highlight: Theme.textPrimary // Для стиля Fusion / Windows
-            palette.text: Theme.textPrimary // Для некоторых других стилей
-
-            Layout.fillWidth: true
-            height: Theme.downloadBtnSize
-            width: Theme.downloadBtnSize
-            running: isLoading
-            visible: isLoading
+        id: rowLayout
+        anchors {
+            fill: parent
+            margins: 10
         }
+        spacing: 15
 
         // Иконка типа файла
         Image {
             source: rootFileCard.fileObj ? rootFileCard.fileObj.icon : ""
-
-
-            /*
-               TODO: Рассмотреть использование Screen.devicePixelRatio
-               или адаптивных единиц для размеров иконок.
-            */
             Layout.preferredWidth: Theme.fileIconSize
             Layout.preferredHeight: Theme.fileIconSize
-            verticalAlignment: Qt.AlignVCenter
+            Layout.alignment: Qt.AlignTop
         }
 
         // Блок текстовой информации
         ColumnLayout {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.fillHeight: false
+            Layout.alignment: Qt.AlignTop
             spacing: 2
 
             Text {
@@ -86,50 +72,95 @@ Rectangle {
             }
 
             Text {
-                // Скрываем строку пути, если она пустая
-                visible: !!(rootFileCard.fileObj
-                            && rootFileCard.fileObj.path !== "")
-                text: rootFileCard.fileObj ? rootFileCard.fileObj.path : ""
+                text: !(rootFileCard.fileObj && rootFileCard.fileObj.path
+                        !== "") ? "Не скачан" : "Скачано (нажмите открыть)"
+                color: !(rootFileCard.fileObj && rootFileCard.fileObj.path
+                         !== "") ? Theme.textSecondary : Theme.accentGreen
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.baseSize
-                color: Theme.textSecondary
                 elide: Text.ElideLeft
                 Layout.fillWidth: true
             }
         }
 
-        // Кнопка скачивания
-        RoundButton {
-            Layout.alignment: Qt.AlignVCenter
-            icon.source: (rootFileCard.fileObj
-                          && rootFileCard.fileObj.path === "") ? "../../assets/icons/download.svg" : "../../assets/icons/openFile.svg"
-            icon.color: Theme.textPrimary
-            icon.width: Theme.downloadBtnSize
-            icon.height: Theme.downloadBtnSize
+        // Блок действий (справа: Кнопка ИЛИ Индикатор)
+        Item {
+            Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
-            // Прозрачный фон для кнопки
-            background: Item {}
+            // Фиксируем размер коробки, чтобы верстка не прыгала
+            Layout.minimumWidth: Theme.downloadBtnSize
+            Layout.minimumHeight: Theme.downloadBtnSize
+            Layout.preferredWidth: Theme.downloadBtnSize
+            Layout.preferredHeight: Theme.downloadBtnSize
 
-            opacity: hovered ? 0.7 : 1.0
-            hoverEnabled: true
+            // Анимация загрузки (крутилка)
+            BusyIndicator {
+                anchors.fill: parent
 
-            property bool isLoading: rootFileCard.fileObj ? rootFileCard.fileObj.isDownloading : false
+                property bool isLoading: rootFileCard.fileObj ? rootFileCard.fileObj.isDownloading : false
+                running: isLoading
+                visible: isLoading
 
-            // Прячем кнопку, пока идет загрузка
-            visible: !isLoading
+                // --- Цвета ---
+                palette.dark: Theme.textPrimary
+                palette.highlight: Theme.textPrimary
+                palette.text: Theme.textPrimary
+                Material.accent: Theme.accentBlue
+            }
 
-            onClicked: {
-                if (!rootFileCard.fileObj)
-                    return
+            // Кнопка скачивания / открытия
+            Image {
+                id: iconImage
+                anchors.fill: parent
 
-                if (rootFileCard.fileObj.path === "") {
-                    appcore.downloadFile(rootFileCard.fileObj)
-                } else {
-                    // Чтобы файл открылся в системной программе (Word, PDF Reader)
-                    // TODO: Проверить на пк, так как было изменено для Андроид
-                    Qt.openUrlExternally(
-                                Qt.resolvedUrl(
-                                    "file:///" + rootFileCard.fileObj.path))
+                property bool isLoading: rootFileCard.fileObj ? rootFileCard.fileObj.isDownloading : false
+                visible: !isLoading
+
+                source: (rootFileCard.fileObj
+                         && rootFileCard.fileObj.path === "") ? "../../assets/icons/download.svg" : "../../assets/icons/openFile.svg"
+
+                sourceSize.width: Theme.downloadBtnSize
+                sourceSize.height: Theme.downloadBtnSize
+
+                layer.enabled: true
+                layer.effect: ColorOverlay {
+                    id: colorOverlay
+
+                    color: Theme.textPrimary
+                }
+
+                // Полупрозрачность при наведении
+                opacity: dlMouseArea.containsMouse ? 0.7 : 1.0
+                MouseArea {
+                    id: dlMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: !parent.isLoading
+                    cursorShape: Qt.PointingHandCursor
+
+                    onClicked: {
+                        if (!rootFileCard.fileObj)
+                            return
+
+                        let currentPath = rootFileCard.fileObj.path
+
+                        if (currentPath === "") {
+                            appcore.downloadFile(rootFileCard.fileObj)
+                        } else {
+                            if (currentPath.startsWith("content://")) {
+                                // Для Android: отдаем ссылку как есть
+                                Qt.openUrlExternally(currentPath)
+                            } else {
+                                // Для ПК (Linux/Windows/macOS):
+                                // Собираем правильный URI без Qt.resolvedUrl.
+                                // Если путь уже начинается со слеша (Linux), добавляем 2 слеша.
+                                // Если с буквы диска (Windows C:/), добавляем 3 слеша.
+                                let prefix = currentPath.startsWith(
+                                        "/") ? "file://" : "file:///"
+                                Qt.openUrlExternally(prefix + currentPath)
+                            }
+                        }
+                    }
                 }
             }
         }

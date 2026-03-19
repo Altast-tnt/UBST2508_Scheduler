@@ -32,8 +32,8 @@ Popup {
 
     // Стандартное позиционирование и размеры
     anchors.centerIn: parent
-    width: parent.width * 0.6
-    height: parent.height * 0.8
+    width: Theme.isMobile ? parent.width * 0.8 : parent.width * 0.6
+    height: Theme.isMobile ? parent.height * 0.8 : parent.height * 0.8
 
     modal: true
     focus: true
@@ -61,8 +61,8 @@ Popup {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 15
+        anchors.margins: Theme.isMobile ? 10 : 20
+        spacing: Theme.isMobile ? 5 : 15
 
         // Блок заголовка
         Text {
@@ -73,8 +73,10 @@ Popup {
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.textPrimary
             Layout.alignment: Qt.AlignHCenter
+
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
+            elide: Text.ElideRight
         }
 
         // Декоративный разделитель
@@ -86,16 +88,23 @@ Popup {
             visible: rootPopup.title !== ""
         }
 
+        ScrollView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
 
-        /*!
+            contentWidth: availableWidth
+
+
+            /*!
             \internal
             Внутренний контейнер, куда пробрасывается контент через алиас.
         */
-        ColumnLayout {
-            id: container
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: 15
+            ColumnLayout {
+                id: container
+                width: parent.width
+                spacing: Theme.isMobile ? 5 : 15
+            }
         }
     }
 }

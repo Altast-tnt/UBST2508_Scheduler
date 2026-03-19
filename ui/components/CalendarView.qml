@@ -74,112 +74,118 @@ ColumnLayout {
         }
     }
 
-    MonthGrid {
-        id: grid
-
+    Rectangle {
         Layout.fillWidth: true
         Layout.fillHeight: true
+        color: "transparent"
 
-        month: rootLayout.baseDate.getMonth()
-        year: rootLayout.baseDate.getFullYear()
+        Flickable {
 
-        locale: Qt.locale("ru_RU")
+            id: flickable
+            anchors.fill: parent
+            contentHeight: grid.height + 50
+            clip: true
 
-        delegate: Rectangle {
-            id: dayCell
+            MonthGrid {
+                id: grid
+                width: flickable.width
+                height: 350
 
-            // получаем данные для конкретной даты
-            property var dayObject: appcore.dayListModel.getDay(model.date)
+                month: rootLayout.baseDate.getMonth()
+                year: rootLayout.baseDate.getFullYear()
 
-            color: cellMouseArea.containsMouse ? Theme.accentBlue : Theme.surface
+                locale: Qt.locale("ru_RU")
 
-            border.width: 1
-            border.color: Theme.textSecondary
-            radius: 4
-
-            Text {
-                anchors {
-                    left: parent.left
-                    top: parent.top
-                    margins: 8
-                }
-                text: model.day
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSmall
-                color: model.month === grid.month ? Theme.textPrimary : Theme.textSecondary
-                opacity: model.month === grid.month ? 1 : 0.5
-                z: 2
-            }
-
-            // Список дедлайнов внутри ячейки дня
-            ListView {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: parent.left
-                    right: parent.right
-                    topMargin: 30
-                    margins: 4
-                }
-
-                spacing: 4
-                clip: true
-                interactive: false
-                // Проверка на существование данных перед биндингом модели
-                model: (dayCell.dayObject
-                        && dayCell.dayObject.dailyDeadlines) ? dayCell.dayObject.dailyDeadlines : null
                 delegate: Rectangle {
-                    property var deadlineObj: model.deadlineObject
-                    width: ListView.view.width
-                    height: 22
-                    radius: 6
+                    id: dayCell
 
-                    color: (deadlineObj
-                            && deadlineObj.isCompleted) ? Theme.accentGreen : Theme.accentRed
+                    // получаем данные для конкретной даты
+                    property var dayObject: appcore.dayListModel.getDay(
+                                                model.date)
+
+                    color: cellMouseArea.containsMouse ? Theme.accentBlue : Theme.surface
+
+                    border.width: 1
+                    border.color: Theme.textSecondary
+                    radius: 4
 
                     Text {
-
                         anchors {
-                            verticalCenter: parent.verticalCenter
                             left: parent.left
-                            right: parent.right
-                            margins: 4
+                            top: parent.top
+                            margins: 8
                         }
-
-                        text: model.subjectName
+                        text: model.day
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.textPrimary
-                        elide: Text.ElideRight
+                        color: model.month === grid.month ? Theme.textPrimary : Theme.textSecondary
+                        opacity: model.month === grid.month ? 1 : 0.5
+                        z: 2
                     }
-                }
-            }
 
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border.color: Theme.accentBlue
-                border.width: 2
-                radius: 4
-                visible: model.today
-                z: 1
-            }
+                    // Список дедлайнов внутри ячейки дня
+                    ListView {
+                        anchors {
+                            bottom: parent.bottom
+                            left: parent.left
+                            right: parent.right
 
-            MouseArea {
-                id: cellMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
+                            margins: 4
+                        }
+                        z: 5
 
-                onClicked: {
-                    // передаем данные из модели в попап
-                    detailsPopup.dateTitle = model.date.toLocaleDateString(
-                                Qt.locale("ru_RU"), "d MMMM yyyy")
+                        orientation: ListView.Horizontal
+                        spacing: 2
+                        height: 6
+                        Layout.alignment: Qt.AlignHCenter
+                        clip: true
+                        interactive: false
 
-                    var dayObj = appcore.dayListModel.getDay(model.date)
+                        model: (dayCell.dayObject
+                                && dayCell.dayObject.dailyDeadlines) ? dayCell.dayObject.dailyDeadlines : null
 
-                    detailsPopup.currentModel = (dayObj) ? dayObj.dailyDeadlines : null
+                        delegate: Rectangle {
+                            property var deadlineObj: model.deadlineObject
+                            width: 6
+                            height: 6
+                            radius: 3
 
-                    detailsPopup.open()
+                            color: (deadlineObj
+                                    && deadlineObj.isCompleted) ? Theme.accentGreen : Theme.accentRed
+
+                            border.color: Theme.textPrimary
+                            border.width: 0.5
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.color: Theme.accentBlue
+                        border.width: 2
+                        radius: 4
+                        visible: model.today
+                        z: 1
+                    }
+
+                    MouseArea {
+                        id: cellMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        propagateComposedEvents: true
+
+                        onClicked: {
+                            // передаем данные из модели в попап
+                            detailsPopup.dateTitle = model.date.toLocaleDateString(
+                                        Qt.locale("ru_RU"), "d MMMM yyyy")
+
+                            var dayObj = appcore.dayListModel.getDay(model.date)
+
+                            detailsPopup.currentModel = (dayObj) ? dayObj.dailyDeadlines : null
+
+                            detailsPopup.open()
+                        }
+                    }
                 }
             }
         }
@@ -206,7 +212,8 @@ ColumnLayout {
         ListView {
             id: popupList
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.preferredHeight: contentHeight
+            interactive: false
             clip: true
             spacing: 10
 
@@ -231,9 +238,10 @@ ColumnLayout {
             spacing: 10
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-            // TODO: Не растягивать картинку, а менять ее фикс размер относительно ширины
             AnimatedImage {
+                id: noDataGif
                 source: "../../assets/images/noDeadline.gif"
+                fillMode: Image.PreserveAspectFit
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.alignment: Qt.AlignHCenter
@@ -245,8 +253,8 @@ ColumnLayout {
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.baseSize
                 color: Theme.textSecondary
-                Layout.fillHeight: true
                 Layout.alignment: Qt.AlignHCenter
+                Layout.fillHeight: true
             }
         }
     }

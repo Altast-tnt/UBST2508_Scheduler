@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Material
 
 
 /*!
@@ -15,15 +16,13 @@ import QtQuick.Layouts
         \li Навигация между основными разделами (Расписание/Дедлайны).
     \endlist
 */
-Window {
+ApplicationWindow {
     id: rootWindow
     width: 1200
     height: 720
-    minimumWidth: 640
-    minimumHeight: 480
     visible: true
     color: Theme.background
-    title: "Проверка"
+    title: "UBST2805 Scheduler"
 
     /*! \internal Функция для адаптивного изменения базового размера шрифта */
     function updateResponsiveStyles() {
@@ -51,12 +50,13 @@ Window {
         id: mainContainer
 
         anchors.fill: parent
-        anchors.margins: 40
-        spacing: 20
+        anchors.margins: Theme.isMobile ? 15 : 40
+        spacing: Theme.isMobile ? 10 : 20
 
         // Верхняя панель (Header)
         RowLayout {
             id: header
+            Layout.fillWidth: true
             Layout.fillHeight: false
 
             // Кнопка настроек
@@ -190,9 +190,13 @@ Window {
             anchors.centerIn: parent
             running: appcore.isLoading
 
+            // --- Для Linux / Windows (стиль Fusion/Basic) ---
             palette.highlight: Theme.accentBlue
             palette.dark: Theme.accentBlue
             palette.text: Theme.accentBlue
+
+            // --- Для ANDROID (стиль Material) ---
+            Material.accent: Theme.accentBlue
         }
     }
 

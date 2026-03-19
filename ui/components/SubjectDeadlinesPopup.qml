@@ -31,7 +31,8 @@ BasePopup {
     ListView {
         id: listView
         Layout.fillWidth: true
-        Layout.fillHeight: true
+        Layout.preferredHeight: contentHeight
+        interactive: false
         clip: true
         spacing: 10
 

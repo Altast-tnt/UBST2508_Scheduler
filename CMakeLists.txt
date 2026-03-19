@@ -46,6 +46,7 @@ qt_add_qml_module(appUBST2508_Sheduler
         ui/components/SettingsButton.qml
         ui/components/SettingsDescription.qml
     RESOURCES
+        "assets/icons/app_icon.png"
         "assets/fonts/Inter_24pt-Medium.ttf"
         "assets/icons/pdf.svg"
         "assets/icons/docx.svg"
@@ -88,7 +89,7 @@ set_target_properties(appUBST2508_Sheduler PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE_ICON_FILE "app_icon.icns"
-    OUTPUT_NAME "UBST2508_Scheduler"
+    #OUTPUT_NAME "UBST2508_Scheduler"
 )
 
 # Указываем CMake, где лежат Android-настройки и Манифест

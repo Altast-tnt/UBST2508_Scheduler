@@ -40,11 +40,14 @@ BasePopup {
         font.family: Theme.fontFamily
         font.pixelSize: Theme.baseSize
         color: Theme.textSecondary
+        Layout.fillWidth: true
+        wrapMode: Text.WordWrap
     }
 
     // Блок Email (использует данные из headerText.teacher)
     RowLayout {
         spacing: 5
+        Layout.fillWidth: true
         Text {
             text: "Email: "
             font.family: Theme.fontFamily
@@ -81,6 +84,7 @@ BasePopup {
     // --- Ссылка на дедлайны ---
     /*! \internal Текстовая ссылка для перехода к списку всех дедлайнов дисциплины */
     Text {
+        Layout.fillWidth: true
         text: "Дедлайны по предмету"
         font.family: Theme.fontFamily
         font.pixelSize: Theme.baseSize
@@ -103,6 +107,7 @@ BasePopup {
 
     // --- Список файлов предмета ---
     Text {
+        Layout.fillWidth: true
         text: "Файлы:"
         font.family: Theme.fontFamily
         font.pixelSize: Theme.baseSize
@@ -112,16 +117,16 @@ BasePopup {
     ListView {
         id: popupList
         Layout.fillWidth: true
-        Layout.fillHeight: true
+        Layout.preferredHeight: contentHeight
         clip: true
         spacing: 10
+        interactive: false
 
         model: appcore.subjectFileModel
 
         delegate: FileCard {
 
             width: popupList.width
-            height: Theme.fileCardHeight
             fileObj: model.fileObject
         }
         visible: count > 0

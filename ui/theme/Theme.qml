@@ -2,14 +2,12 @@ pragma Singleton
 
 import QtQuick
 
-//TODO: Перепроверить размерность экрана (на раскладушке берется размер наибольшего и наименьший игнорируется)
-//TODO: Некоторые цвета не применяются (на крутилке пропал цвет)
-//TODO: В некоторых местах не применяется шрифт
-//TODO: Не применилась иконка приложения
-//TODO: Не применилось название приложения
 QtObject {
     // Цветовая тема (светлая/темная)
     property bool isDark: false
+
+    readonly property bool isMobile: (Qt.platform.os === "android"
+                                      || Qt.platform.os === "ios")
 
     // Фон всего приложения
     readonly property color background: isDark ? "#111827" : "#F5F7FA"
@@ -36,14 +34,14 @@ QtObject {
 
     // Размерность элементов
     property real headerButtonSize: baseSize * 3
-    property real columnWidthDayBoard: 250
-    property real cardsWidth: 260
-    property real fileCardHeight: 60
+    property real columnWidthDayBoard: isMobile ? 230 : 250
+    property real cardsWidth: isMobile ? 200 : 260
+    property real fileCardHeight: isMobile ? 50 : 60
     property real checkBoxSize: 20
-    property real fileIconSize: 40
+    property real fileIconSize: isMobile ? 30 : 40
     property real downloadBtnSize: 24
-    property real segmentedToggleWidth: 340
-    property real segmentedToggleWidthSmall: 230
+    property real segmentedToggleWidth: isMobile ? 220 : 340
+    property real segmentedToggleWidthSmall: isMobile ? 160 : 230
     property real delegateDateRectHeight: 40
     property real dateRectHeight: 30
 

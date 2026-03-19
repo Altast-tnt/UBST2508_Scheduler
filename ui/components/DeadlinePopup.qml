@@ -185,9 +185,10 @@ BasePopup {
     ListView {
         id: popupList
         Layout.fillWidth: true
-        Layout.fillHeight: true
+        Layout.preferredHeight: contentHeight
         clip: true
         spacing: 10
+        interactive: false
 
         // Ожидается модель файлов из C++
         model: appcore.deadlineFileModel
@@ -195,7 +196,6 @@ BasePopup {
         delegate: FileCard {
 
             width: popupList.width
-            height: Theme.fileCardHeight
             fileObj: model.fileObject
         }
         visible: count > 0

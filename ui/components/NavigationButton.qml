@@ -46,7 +46,7 @@ RoundButton {
     background: Rectangle {
         radius: 100
         // Плавная смена цвета при наведении
-        color: btArrow.hovered ? Theme.accentBlue : "transparent"
+        color: btArrow.down ? Theme.accentBlue : (btArrow.hovered ? Theme.accentBlue : "transparent")
         opacity: 0.8
     }
 }
