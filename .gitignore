@@ -110,3 +110,13 @@ build-android-*/
 .gradle/
 build/
 app/build/
+
+
+# --- Linux AppImage Packaging ---
+# Игнорируем утилиту упаковки
+linuxdeployqt*.AppImage
+# Игнорируем временную директорию сборки
+AppDir/
+# Игнорируем готовые релизные файлы 
+*.AppImage
+*.zsync
