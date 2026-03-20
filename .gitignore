@@ -93,4 +93,20 @@ install_manifest.txt
 _deps/
 *.cmake
 
+# --- Android Specific ---
+*.keystore
+*.jks
 
+# Локальные настройки Android (пути к SDK и прочее)
+local.properties
+.gradle/
+.android/
+
+# Временные файлы сборки Android
+android-build/
+build-android-*/
+
+# Gradle-файлы
+.gradle/
+build/
+app/build/
