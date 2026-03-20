@@ -18,6 +18,7 @@ endif()
 
 qt_add_executable(appUBST2508_Sheduler
     main.cpp
+    "assets/icons/app_icon.rc"
     ${APP_ICON_FILE}
 )
 
