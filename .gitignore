@@ -140,3 +140,15 @@ Debug/
 Release/
 x64/
 x86/
+
+# --- macOS / Apple ---
+# Файлы настроек системы 
+.DS_Store
+# Папки сборки macOS/iOS
+*.dSYM
+*.build/
+*.xcodeproj/
+*.xcworkspace/
+# Пакеты
+*.app
+*.ipa
